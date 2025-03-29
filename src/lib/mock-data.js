@@ -1,0 +1,180 @@
+
+import { Event, Ticket, Notification } from "./types";
+import { generateTicketId, encryptData } from "./utils";
+
+export const MOCK_EVENTS = [
+  {
+    id: "evt-1",
+    title: "Annual Tech Summit",
+    description: "Join us for the biggest tech event of the year. Learn from industry experts, network with peers, and explore cutting-edge technologies.",
+    venue: "Main Auditorium",
+    date: "2023-12-15",
+    time: "09:00:00",
+    endTime: "18:00:00",
+    organizerId: "manager-1",
+    organizerName: "Tech Club",
+    capacity: 500,
+    price: 0,
+    imageUrl: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+    category: "Technology",
+    tags: ["tech", "summit", "conference"],
+    status: "published",
+    createdAt: "2023-10-01T12:00:00Z",
+    featured: true,
+    registrations: 210,
+  },
+  {
+    id: "evt-2",
+    title: "Cultural Night",
+    description: "Experience diverse cultures through performances, food, and interactive activities. A night to celebrate our global community.",
+    venue: "College Grounds",
+    date: "2023-11-25",
+    time: "17:00:00",
+    endTime: "22:00:00",
+    organizerId: "manager-2",
+    organizerName: "Cultural Club",
+    capacity: 1000,
+    price: 50,
+    imageUrl: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+    category: "Cultural",
+    tags: ["culture", "performance", "food"],
+    status: "published",
+    createdAt: "2023-09-15T14:20:00Z",
+    registrations: 450,
+  },
+  {
+    id: "evt-3",
+    title: "Hackathon 2023",
+    description: "48 hours of coding, creativity, and collaboration. Solve real-world problems and compete for exciting prizes.",
+    venue: "Computer Science Building",
+    date: "2023-12-08",
+    time: "16:00:00",
+    endTime: "16:00:00",
+    organizerId: "manager-1",
+    organizerName: "Tech Club",
+    capacity: 200,
+    price: 0,
+    imageUrl: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+    category: "Technology",
+    tags: ["hackathon", "coding", "competition"],
+    status: "published",
+    createdAt: "2023-09-28T09:10:00Z",
+    registrations: 120,
+  },
+  {
+    id: "evt-4",
+    title: "Career Fair",
+    description: "Connect with top employers, explore internship and job opportunities, and attend resume workshops.",
+    venue: "Main Hall",
+    date: "2023-11-15",
+    time: "10:00:00",
+    endTime: "16:00:00",
+    organizerId: "manager-3",
+    organizerName: "Placement Cell",
+    capacity: 800,
+    price: 0,
+    imageUrl: "https://images.unsplash.com/photo-1560523159-4a9692d222f9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+    category: "Career",
+    tags: ["career", "jobs", "internships"],
+    status: "published",
+    createdAt: "2023-09-10T11:30:00Z",
+    registrations: 550,
+  },
+  {
+    id: "evt-5",
+    title: "Sports Tournament",
+    description: "Compete in various sports including cricket, football, basketball, and more. Show your sporting spirit!",
+    venue: "Sports Complex",
+    date: "2023-11-18",
+    time: "08:00:00",
+    endTime: "18:00:00",
+    organizerId: "manager-4",
+    organizerName: "Sports Club",
+    capacity: 300,
+    price: 100,
+    imageUrl: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+    category: "Sports",
+    tags: ["sports", "tournament", "competition"],
+    status: "published",
+    createdAt: "2023-09-20T13:45:00Z",
+    registrations: 180,
+  },
+];
+
+export const MOCK_TICKETS=[
+  {
+    id: generateTicketId(),
+    eventId: "evt-1",
+    userId: "user-1",
+    userName: "Regular User",
+    userEmail: "user@eventx.com",
+    price: 0,
+    status: "confirmed",
+    ticketType: "standard",
+    purchaseDate: "2023-10-10T14:22:00Z",
+    qrData: encryptData({
+      ticketId: generateTicketId(),
+      eventId: "evt-1",
+      userId: "user-1"
+    }),
+  },
+  {
+    id: generateTicketId(),
+    eventId: "evt-2",
+    userId: "user-1",
+    userName: "Regular User",
+    userEmail: "user@eventx.com",
+    price: 50,
+    status: "confirmed",
+    ticketType: "standard",
+    purchaseDate: "2023-10-12T09:45:00Z",
+    qrData: encryptData({
+      ticketId: generateTicketId(),
+      eventId: "evt-2",
+      userId: "user-1"
+    }),
+  }
+];
+
+export const MOCK_NOTIFICATIONS = [
+  {
+    id: "notif-1",
+    userId: "user-1",
+    title: "Event Reminder",
+    message: "Your event 'Annual Tech Summit' is tomorrow. Don't forget to bring your ticket!",
+    type: "info",
+    read: false,
+    createdAt: "2023-12-14T10:00:00Z",
+    link: "/events/evt-1",
+  },
+  {
+    id: "notif-2",
+    userId: "user-1",
+    title: "Ticket Confirmed",
+    message: "Your booking for 'Cultural Night' has been confirmed. We've sent the ticket to your email.",
+    type: "success",
+    read: true,
+    createdAt: "2023-10-12T09:46:00Z",
+    link: "/tickets",
+  },
+];
+
+// Categories with icons (using Lucide icon names)
+export const EVENT_CATEGORIES = [
+  { name: "Technology", icon: "Cpu" },
+  { name: "Cultural", icon: "Palette" },
+  { name: "Career", icon: "Briefcase" },
+  { name: "Sports", icon: "Trophy" },
+  { name: "Academic", icon: "GraduationCap" },
+  { name: "Workshop", icon: "Hammer" },
+  { name: "Seminar", icon: "Presentation" },
+  { name: "Competition", icon: "Medal" },
+];
+
+
+module.exports = {
+  MOCK_EVENTS,
+  MOCK_TICKETS,
+  MOCK_NOTIFICATIONS,
+  EVENT_CATEGORIES
+};

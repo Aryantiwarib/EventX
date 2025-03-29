@@ -15,7 +15,7 @@ export class Service {
         this.bucket = new Storage(this.client);
     }
 
-    async createEvent({ title, slug, price, CollegeYear, category, date, venue, template, description, status, userId }) {
+    async createEvent({ title, slug, price, CollegeYear, category, date, venue, template, description, status, userId}) {
         try {
             if (!template || typeof template !== "string") {
                 throw new Error("Valid template ID is required");
@@ -36,6 +36,8 @@ export class Service {
                     description,
                     status,
                     userId,
+                    attendees: '',
+                    
                 }
             );
         } catch (error) {
@@ -45,6 +47,7 @@ export class Service {
     }
 
     async updateEvent(slug, { title, price, CollegeYear, category, date, venue, template, description, status, userId }) {
+        
         try {
             return await this.databases.updateDocument(
                 conf.appwriteDatabaseId,
@@ -68,6 +71,9 @@ export class Service {
             throw error;
         }
     }
+
+    
+
 
     async uploadFile(file) {
         try {
@@ -144,6 +150,129 @@ export class Service {
             fileId,
         )
     }
+
+
+// BOOKING AND PAYMENTS METHODS 
+
+ // Booking Methods
+ async createBooking({ eventId, userId, paymentId, ticketHolderName, ticketHolderEmail, amount }) {
+    try {
+        return await this.databases.createDocument(
+            conf.appwriteDatabaseId,
+            conf.appwriteCollectionBookingId,
+            ID.unique(),
+            {
+                eventId,
+                userId,
+                paymentId,
+                ticketHolderName,
+                ticketHolderEmail,
+                amount: amount.toString(),
+                status: 'confirmed',
+                bookingDate: new Date().toISOString()
+            }
+        );
+    } catch (error) {
+        console.error(`Appwrite :: createBooking :: ${error}`);
+        throw error;
+    }
+}
+
+async getBookingsByUser(userId) {
+    try {
+        return await this.databases.listDocuments(
+            conf.appwriteDatabaseId,
+            conf.appwriteCollectionBookingId,
+            [Query.equal('userId', userId)]
+        );
+    } catch (error) {
+        console.error(`Appwrite :: getBookingsByUser :: ${error}`);
+        throw error;
+    }
+}
+
+async getEventBookings(eventId) {
+    try {
+        return await this.databases.listDocuments(
+            conf.appwriteDatabaseId,
+            conf.appwriteCollectionBookingId,
+            [Query.equal('eventId', eventId)]
+        );
+    } catch (error) {
+        console.error(`Appwrite :: getEventBookings :: ${error}`);
+        throw error;
+    }
+}
+
+// Payment Methods
+async createPaymentRecord(paymentData) {
+    try {
+        return await this.databases.createDocument(
+            conf.appwriteDatabaseId,
+            conf.appwriteCollectionPaymentsId,
+            ID.unique(),
+            {
+                userId: paymentData.userId,
+                eventId: paymentData.eventId,
+                paymentId: paymentData.paymentId,
+                amount: paymentData.amount,
+                currency: paymentData.currency,
+                paymentMethod: paymentData.paymentMethod,
+                status: paymentData.status,
+                paymentDate: new Date().toISOString()
+            }
+        );
+    } catch (error) {
+        console.error(`Appwrite :: createPaymentRecord :: ${error}`);
+        throw error;
+    }
+}
+
+async getPaymentsByUser(userId) {
+    try {
+        return await this.databases.listDocuments(
+            conf.appwriteDatabaseId,
+            conf.appwriteCollectionPaymentsId,
+            [Query.equal('userId', userId)]
+        );
+    } catch (error) {
+        console.error(`Appwrite :: getPaymentsByUser :: ${error}`);
+        throw error;
+    }
+}
+
+
+// Add this to your service class
+async deleteBooking(bookingId) {
+    try {
+      await this.databases.deleteDocument(
+        conf.appwriteDatabaseId,
+        conf.appwriteCollectionBookingId,
+        bookingId
+      );
+      return true;
+    } catch (error) {
+      console.error('Failed to delete booking:', error);
+      return false;
+    }
+  }
+  
+  async deletePayment(paymentId) {
+    try {
+      await this.databases.deleteDocument(
+        conf.appwriteDatabaseId,
+        conf.appwriteCollectionPaymentsId,
+        paymentId
+      );
+      return true;
+    } catch (error) {
+      console.error('Failed to delete payment:', error);
+      return false;
+    }
+  }
+
+
+
 
 }
 

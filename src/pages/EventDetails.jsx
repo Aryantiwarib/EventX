@@ -110,6 +110,11 @@ function EventDetails() {
         hour12: true
     })
 
+    
+    const handleCardClick = (e) => {
+        navigate(e === "book" ? "/book-event" : `/event/${event}`);
+      };
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -308,14 +313,25 @@ function EventDetails() {
                                         </span>
                                     </div>
                                 </div>
-
+                                
+                                <Link to={`/book-event/${event.$id}`}>
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+                                    onClick={() => handleCardClick("book-event")}
                                 >
                                     Book Now
                                 </motion.button>
+                                </Link>
+
+                                
+                            {/* <Button className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all hover:scale-105">
+                                <FaEdit className="text-sm" />
+                                <span className="hidden sm:inline">Edit Event</span>
+                            </Button> */}
+                        
+
 
                                 <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
                                     <h4 className="font-semibold text-gray-800 mb-2">What's Included</h4>

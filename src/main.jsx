@@ -15,6 +15,10 @@ import AllEvents from "./pages/AllEvents.jsx"
 import { AddEvent } from './components/index.js';
 import EventDetails from './pages/EventDetails.jsx';
 import EditEvent from "./pages/EditEvent.jsx"
+import BookEvent from './BookingAndPayment/BookEvent.jsx';
+import Dashboard from './pages/Dashboard.jsx';
+import EventAttendees from './components/EventAttendees.jsx';
+import Support from './pages/Support.jsx';
 
 const router = createBrowserRouter([
   {
@@ -86,6 +90,42 @@ const router = createBrowserRouter([
             </AuthLayout>
         ),
     },
+    {
+      path: "/book-event/:eventId",
+      element: (
+          <AuthLayout authentication>
+              {" "}
+              <BookEvent />
+          </AuthLayout>
+      ),
+  },
+  {
+    path: "/dashboard",
+    element: (
+        <AuthLayout authentication>
+            {" "}
+            <Dashboard />
+        </AuthLayout>
+    ),
+},
+  {
+    path: "/event-attendees/:eventId",
+    element: (
+        <AuthLayout authentication>
+            {" "}
+            <EventAttendees />
+        </AuthLayout>
+    ),
+},
+{
+  path: "/support",
+  element: (
+      <AuthLayout authentication>
+          {" "}
+          <Support />
+      </AuthLayout>
+  ),
+},
       
       
     ]

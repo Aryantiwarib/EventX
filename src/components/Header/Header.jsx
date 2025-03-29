@@ -31,7 +31,7 @@ function Header() {
         setIsLoginModalOpen(false);
       }
     },  
-    { name: 'About', slug: '/about', active: authStatus },
+    { name: 'About', slug: '/dashboard', active: authStatus },
     { name: 'Add Event', slug: '/add-event', active: authStatus },
   ];
 
