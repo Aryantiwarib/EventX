@@ -94,13 +94,13 @@ function BookEvent() {
 
 
                     // Update event attendees
-                    const currentAttendees = event.attendees
-                        ? event.attendees.split(',').filter(Boolean)
-                        : [];
+                    // const currentAttendees = event.attendees
+                    //     ? event.attendees.split(',').filter(Boolean)
+                    //     : [];
 
-                    await appwriteService.updateEvent(event.$id, { // Changed from event.slug to event.$id
-                        attendees: [...currentAttendees, currentUser.$id].join(',')
-                    });
+                    // await appwriteService.updateEvent(event.$id, { // Changed from event.slug to event.$id
+                    //     attendees: [...currentAttendees, currentUser.$id].join(',')
+                    // });
 
                     navigate('/dashboard', {
                         state: {

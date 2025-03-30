@@ -18,14 +18,22 @@ const DashboardStats = ({ userId }) => {
                     service.getEvents([Query.equal('userId', userId)])
                 ]);
 
-                const attended = bookings.documents.filter(booking => {
-                    const eventDate = new Date(booking.event.date);
-                    return eventDate < new Date();
-                });
+
+                const events = await Promise.all(
+                    bookings.documents.map(booking => 
+                      service.getEvent(booking.eventId) 
+                    )
+                  );
+
+                const attended = events.filter(event => {
+                    if (!event?.date) return false;
+                    return new Date(event.date) < new Date();
+                  }).length;
+
 
                 setStats({
                     booked: bookings.total,
-                    attended: attended.length,
+                    attended,
                     organized: organized.total
                 });
             } catch (error) {

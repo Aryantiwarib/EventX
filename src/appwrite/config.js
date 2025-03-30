@@ -72,8 +72,6 @@ export class Service {
         }
     }
 
-    
-
 
     async uploadFile(file) {
         try {
@@ -168,7 +166,7 @@ export class Service {
                 ticketHolderName,
                 ticketHolderEmail,
                 amount: amount.toString(),
-                status: 'confirmed',
+                status: 'registered', // Default status
                 bookingDate: new Date().toISOString()
             }
         );
@@ -192,7 +190,10 @@ async getBookingsByUser(userId) {
 }
 
 async getEventBookings(eventId) {
-    try {
+    if (!eventId) {
+        throw new Error("Event ID is required");
+    }
+    try {  
         return await this.databases.listDocuments(
             conf.appwriteDatabaseId,
             conf.appwriteCollectionBookingId,
@@ -272,6 +273,58 @@ async deleteBooking(bookingId) {
   }
 
 
+//   attendees methods 
+
+
+// Add these methods to your Service class
+
+// Get single attendee by booking ID
+async getAttendee(bookingId) {
+    try {
+        return await this.databases.getDocument(
+            conf.appwriteDatabaseId,
+            conf.appwriteCollectionBookingId,
+            bookingId
+        );
+    } catch (error) {
+        console.error(`Appwrite :: getAttendee :: ${error}`);
+        throw error;
+    }
+}
+
+// Update attendee status
+async updateAttendeeStatus(bookingId, newStatus) {
+    try {
+        return await this.databases.updateDocument(
+            conf.appwriteDatabaseId,
+            conf.appwriteCollectionBookingId,
+            bookingId,
+            {
+                status: newStatus
+            }
+        );
+    } catch (error) {
+        console.error(`Appwrite :: updateAttendeeStatus :: ${error}`);
+        throw error;
+    }
+}
+
+// Get attendees with status filter
+async getAttendeesByStatus(eventId, status) {
+    try {
+        return await this.databases.listDocuments(
+            conf.appwriteDatabaseId,
+            conf.appwriteCollectionBookingId,
+            [
+                Query.equal('eventId', eventId),
+                Query.equal('status', status)
+            ]
+        );
+    } catch (error) {
+        console.error(`Appwrite :: getAttendeesByStatus :: ${error}`);
+        throw error;
+    }
+}
 
 
 }

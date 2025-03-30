@@ -10,7 +10,11 @@ import {
     FaTimes,
     FaExpand,
     FaEdit,
-    FaTrash
+    FaTrash,
+    FaUser,
+    FaShareAlt,
+    FaSearch,
+    FaHeart
 } from 'react-icons/fa'
 import { Button } from '../components'
 import parse from 'html-react-parser'
@@ -29,6 +33,9 @@ function EventDetails() {
     const [imageLoaded, setImageLoaded] = useState(false)
     const userData = useSelector((state) => state.auth.userData)
     const [isAuthor, setIsAuthor] = useState(false)
+    const [isRegistered, setIsRegistered] = useState(false)
+    const [attendeeCount, setAttendeeCount] = useState(0)
+    const [liked, setLiked] = useState(false)
 
     useEffect(() => {
         const fetchEvent = async () => {
@@ -41,6 +48,14 @@ function EventDetails() {
                     // Check authorization after data loads
                     if (userData && data.userId === userData.$id) {
                         setIsAuthor(true)
+                    }
+                    
+                    // Fetch attendee count
+                    fetchAttendeeCount(data.$id)
+                    
+                    // Check if user is registered
+                    if (userData) {
+                        checkUserRegistration(data.$id, userData.$id)
                     }
                 } else {
                     setError('Event not found')
@@ -59,7 +74,29 @@ function EventDetails() {
             setError('Invalid event ID')
             setLoading(false)
         }
-    }, [eventId, userData]) // Added userData to dependencies
+    }, [eventId, userData])
+
+    const fetchAttendeeCount = async (eventId) => {
+        try {
+            // Replace this with your actual attendee count fetching logic
+            const attendees = await appwriteService.getEventAttendees(eventId)
+            setAttendeeCount(attendees?.length || 0)
+        } catch (error) {
+            console.error('Error fetching attendee count:', error)
+            setAttendeeCount(0)
+        }
+    }
+
+    const checkUserRegistration = async (eventId, userId) => {
+        try {
+            // Replace this with your actual registration check logic
+            const registrationData = await appwriteService.checkEventRegistration(eventId, userId)
+            setIsRegistered(!!registrationData)
+        } catch (error) {
+            console.error('Error checking registration:', error)
+            setIsRegistered(false)
+        }
+    }
 
     const deleteEvent = () => {
         appwriteService.deleteEvent(event.$id).then((status) => {
@@ -68,6 +105,11 @@ function EventDetails() {
                 navigate('/events')
             }
         })
+    }
+
+    const toggleLike = () => {
+        setLiked(!liked)
+        // You could add API call here to save the like status
     }
 
     if (loading) {
@@ -110,255 +152,320 @@ function EventDetails() {
         hour12: true
     })
 
-    
-    const handleCardClick = (e) => {
-        navigate(e === "book" ? "/book-event" : `/event/${event}`);
-      };
-
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-12">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Author Controls - Fixed Positioning */}
-                {isAuthor && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="fixed right-6 top-24 flex gap-3 z-50 bg-white/90 backdrop-blur-sm p-3 rounded-xl shadow-lg border border-gray-200"
-                    >
-                        <Link to={`/edit-event/${event.$id}`}>
-                            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all hover:scale-105">
-                                <FaEdit className="text-sm" />
-                                <span className="hidden sm:inline">Edit Event</span>
-                            </Button>
+        <div className="bg-white min-h-screen">
+            {/* Top Navigation Bar */}
+            <div className="bg-white shadow-sm border-b">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-between items-center h-16">
+                        <Link to="/events" className="flex items-center text-blue-600 hover:text-blue-800 transition-colors">
+                            <FaArrowLeft className="mr-2" />
+                            <span className="font-medium">Back</span>
                         </Link>
-                        <Button
-                            className="bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all hover:scale-105"
-                            onClick={deleteEvent}
-                        >
-                            <FaTrash className="text-sm" />
-                            <span className="hidden sm:inline">Delete Event</span>
-                        </Button>
-                    </motion.div>
-                )}
+                        <div className="flex items-center space-x-4">
+                            {isAuthor && (
+                                <div className="flex gap-2">
+                                    <Link to={`/edit-event/${event.$id}`}>
+                                        <Button className="bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-all border border-gray-200 hover:shadow-md">
+                                            <FaEdit className="text-sm" />
+                                            <span>Edit</span>
+                                        </Button>
+                                    </Link>
+                                    <Button
+                                        className="bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-all border border-gray-200 hover:shadow-md hover:text-red-600"
+                                        onClick={deleteEvent}
+                                    >
+                                        <FaTrash className="text-sm" />
+                                        <span>Delete</span>
+                                    </Button>
+                                </div>
+                            )}
+                            <button 
+                                className="p-2 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 hover:scale-105 transition-all"
+                                title="Share"
+                            >
+                                <FaShareAlt />
+                            </button>
+                            <button 
+                                className={`p-2 rounded-full ${liked ? 'bg-red-50 text-red-500' : 'bg-gray-100 text-gray-600'} hover:bg-red-50 hover:text-red-500 hover:scale-105 transition-all`}
+                                onClick={toggleLike}
+                                title={liked ? "Unlike" : "Like"}
+                            >
+                                <FaHeart />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                <Link
-                    to="/events"
-                    className="mb-8 inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-                >
-                    <FaArrowLeft className="mr-2" />
-                    Back to Events
-                </Link>
+            {/* Main Content */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Header Image Section */}
+                <div className="relative rounded-xl overflow-hidden h-[400px] mb-8 group">
+                    <LazyLoadImage
+                        src={appwriteService.getFilePreview(event.template)}
+                        alt={event.title}
+                        className="w-full h-full object-cover cursor-pointer transition-transform duration-200 group-hover:scale-105"
+                        effect="opacity"
+                        beforeLoad={() => setImageLoaded(false)}
+                        afterLoad={() => setImageLoaded(true)}
+                        threshold={200}
+                        onClick={() => setShowImageModal(true)}
+                    />
+                    {!imageLoaded && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100 animate-shimmer" />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
+                        <div className="p-8 w-full">
+                            <div className="mb-2">
+                                <span className="inline-block bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                                    {event.category}
+                                </span>
+                            </div>
+                            <h1 className="text-4xl font-bold text-white mb-4">{event.title}</h1>
+                            <div className="flex flex-wrap gap-4 text-white">
+                                <div className="flex items-center">
+                                    <FaCalendarAlt className="mr-2" />
+                                    <span>{eventDate} at {eventTime}</span>
+                                </div>
+                                <div className="flex items-center">
+                                    <FaMapMarkerAlt className="mr-2" />
+                                    <span>{event.venue}</span>
+                                </div>
+                                {attendeeCount > 0 && (
+                                    <div className="flex items-center">
+                                        <FaUser className="mr-2" />
+                                        <span>{attendeeCount} {attendeeCount === 1 ? 'attendee' : 'attendees'}</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* View Fullscreen Button */}
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button 
+                            className="p-3 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors"
+                            onClick={() => setShowImageModal(true)}
+                            title="View Fullscreen"
+                        >
+                            <FaExpand />
+                        </button>
+                    </div>
+                </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Main Content */}
+                    {/* Left Content Column */}
                     <div className="lg:col-span-2">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="bg-white rounded-xl shadow-lg p-6 mb-8 relative"
-                        >
-                            <h1 className="text-4xl font-bold text-gray-800 mb-4 font-serif">
-                                {event.title}
-                            </h1>
-
-                            <div className="relative h-[500px] rounded-xl overflow-hidden mb-6 group">
-                                <div
-                                    className="relative h-full w-full cursor-zoom-in transition-all duration-500"
-                                    onClick={() => setShowImageModal(true)}
-                                >
-                                    <LazyLoadImage
-                                        src={appwriteService.getFilePreview(event.template)}
-                                        alt={event.title}
-                                        className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-105"
-                                        effect="opacity"
-                                        beforeLoad={() => setImageLoaded(false)}
-                                        afterLoad={() => setImageLoaded(true)}
-                                        threshold={200}
-                                    />
-
-                                    {!imageLoaded && (
-                                        <div className="absolute inset-0 bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100 animate-shimmer">
-                                            <div className="absolute inset-0 bg-white/30 backdrop-blur-sm" />
-                                        </div>
-                                    )}
-
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center p-6">
-                                        <div className="text-center text-white translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                                            <FaExpand className="text-3xl mx-auto mb-2" />
-                                            <p className="font-medium tracking-wide">Click to Expand</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <AnimatePresence>
-                                    {showImageModal && (
-                                        <motion.div
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            className="fixed inset-0 bg-black/95 backdrop-blur-xl z-[999] flex items-center justify-center p-4"
-                                            onClick={(e) => e.target === e.currentTarget && setShowImageModal(false)}
-                                        >
-                                            <div className="relative max-w-6xl w-full h-[90vh] flex flex-col">
-                                                <div className="flex justify-between items-center mb-4 px-4">
-                                                    <h2 className="text-xl text-white font-medium">{event.title}</h2>
-                                                    <button
-                                                        className="p-2 hover:bg-white/10 rounded-full transition-colors"
-                                                        onClick={() => setShowImageModal(false)}
-                                                        aria-label="Close image viewer"
-                                                    >
-                                                        <FaTimes className="text-2xl text-white" />
-                                                    </button>
-                                                </div>
-
-                                                <motion.div
-                                                    initial={{ scale: 0.95 }}
-                                                    animate={{ scale: 1 }}
-                                                    className="relative flex-1 bg-black rounded-xl overflow-hidden shadow-2xl"
-                                                >
-                                                    <img
-                                                        src={appwriteService.getFilePreview(event.template)}
-                                                        alt={event.title}
-                                                        className="w-full h-full object-contain"
-                                                        onClick={(e) => e.stopPropagation()}
-                                                    />
-                                                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
-                                                        <div className="h-1 w-24 bg-white/20 rounded-full overflow-hidden">
-                                                            <motion.div
-                                                                initial={{ width: 0 }}
-                                                                animate={{ width: "100%" }}
-                                                                transition={{ duration: 0.8, ease: "easeInOut" }}
-                                                                className="h-full bg-white"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </motion.div>
-
-                                                <div className="mt-4 text-center text-gray-300 text-sm">
-                                                    {event.venue} • {eventDate}
-                                                </div>
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
+                        {/* Tabs */}
+                        <div className="mb-8 border-b">
+                            <div className="flex space-x-8">
+                                <button className="pb-4 px-2 border-b-2 border-blue-500 font-medium text-blue-600 transition-colors hover:text-blue-700">
+                                    About
+                                </button>
+                                <button className="pb-4 px-2 text-gray-500 hover:text-gray-900 transition-colors">
+                                    Schedule
+                                </button>
+                                <button className="pb-4 px-2 text-gray-500 hover:text-gray-900 transition-colors">
+                                    Organizer
+                                </button>
                             </div>
+                        </div>
 
-                            <div className="space-y-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                                    <motion.div
-                                        whileHover={{ scale: 1.02 }}
-                                        className="flex items-center bg-blue-50 p-4 rounded-lg border border-blue-100"
-                                    >
-                                        <FaCalendarAlt className="text-blue-600 text-2xl mr-3" />
-                                        <div>
-                                            <p className="text-sm text-gray-600 mb-1">Date & Time</p>
-                                            <p className="font-semibold text-gray-800">
-                                                {eventDate} • {eventTime}
-                                            </p>
-                                        </div>
-                                    </motion.div>
-
-                                    <motion.div
-                                        whileHover={{ scale: 1.02 }}
-                                        className="flex items-center bg-blue-50 p-4 rounded-lg border border-blue-100"
-                                    >
-                                        <FaMapMarkerAlt className="text-blue-600 text-2xl mr-3" />
-                                        <div>
-                                            <p className="text-sm text-gray-600 mb-1">Venue</p>
-                                            <p className="font-semibold text-gray-800">{event.venue}</p>
-                                        </div>
-                                    </motion.div>
-                                </div>
-
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    className="bg-gray-50 p-6 rounded-xl border border-gray-100"
-                                >
-                                    <h2 className="text-2xl font-bold text-gray-800 mb-4 font-serif">
-                                        Event Details
-                                    </h2>
-                                    <div className="browser-css text-gray-600 leading-relaxed prose max-w-none">
-                                        {parse(event.description || '')}
-                                    </div>
-                                </motion.div>
+                        {/* About Section */}
+                        <div className="mb-8">
+                            <h2 className="text-2xl font-bold mb-4">About This Event</h2>
+                            <div className="prose max-w-none text-gray-600">
+                                {parse(event.description || '')}
                             </div>
-                        </motion.div>
-                    </div>
+                        </div>
 
-                    {/* Booking Sidebar */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="lg:col-span-1"
-                    >
-                        <div className="bg-white rounded-xl shadow-lg p-6 sticky top-8 border border-gray-100">
-                            <div className="space-y-6">
-                                <div className="border-b pb-4">
-                                    <h3 className="text-2xl font-bold text-gray-800 mb-4 font-serif">
-                                        Booking Information
-                                    </h3>
-
-                                    <div className="flex items-center mb-3">
-                                        <FaTag className="text-gray-600 mr-2" />
-                                        <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-medium">
-                                            {event.category}
-                                        </span>
+                        {/* What to Expect Section */}
+                        <div className="mb-8">
+                            <h2 className="text-2xl font-bold mb-4">What to Expect</h2>
+                            <div className="space-y-4">
+                                <div className="flex items-start group p-3 rounded-lg transition-all hover:bg-blue-50">
+                                    <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-4 group-hover:bg-blue-200 transition-colors">
+                                        <FaCalendarAlt />
                                     </div>
-
-                                    <div className="flex items-center">
-                                        <FaMoneyBillWave className="text-gray-600 mr-2" />
-                                        <span className="text-2xl font-bold text-gray-800">
-                                            ₹{event.price?.toLocaleString()}
-                                        </span>
+                                    <div>
+                                        <h3 className="font-semibold text-lg group-hover:text-blue-700 transition-colors">Engaging Sessions</h3>
+                                        <p className="text-gray-600">Participate in interactive workshops and sessions</p>
                                     </div>
                                 </div>
-                                
-                                <Link to={`/book-event/${event.$id}`}>
-                                <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
-                                    onClick={() => handleCardClick("book-event")}
-                                >
-                                    Book Now
-                                </motion.button>
-                                </Link>
-
-                                
-                            {/* <Button className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all hover:scale-105">
-                                <FaEdit className="text-sm" />
-                                <span className="hidden sm:inline">Edit Event</span>
-                            </Button> */}
-                        
-
-
-                                <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                                    <h4 className="font-semibold text-gray-800 mb-2">What's Included</h4>
-                                    <ul className="list-disc list-inside text-gray-600 space-y-2">
-                                        <li className="flex items-center">
-                                            <span className="w-2 h-2 bg-blue-600 rounded-full mr-2"></span>
-                                            Full event access
-                                        </li>
-                                        <li className="flex items-center">
-                                            <span className="w-2 h-2 bg-blue-600 rounded-full mr-2"></span>
-                                            Entry to all sessions
-                                        </li>
-                                        <li className="flex items-center">
-                                            <span className="w-2 h-2 bg-blue-600 rounded-full mr-2"></span>
-                                            Exclusive event goodie bag
-                                        </li>
-                                        <li className="flex items-center">
-                                            <span className="w-2 h-2 bg-blue-600 rounded-full mr-2"></span>
-                                            Networking opportunities
-                                        </li>
-                                    </ul>
+                                <div className="flex items-start group p-3 rounded-lg transition-all hover:bg-blue-50">
+                                    <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-4 group-hover:bg-blue-200 transition-colors">
+                                        <FaUser />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-lg group-hover:text-blue-700 transition-colors">Networking Opportunities</h3>
+                                        <p className="text-gray-600">Connect with like-minded individuals and professionals</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-start group p-3 rounded-lg transition-all hover:bg-blue-50">
+                                    <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-4 group-hover:bg-blue-200 transition-colors">
+                                        <FaTag />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-lg group-hover:text-blue-700 transition-colors">Exclusive Perks</h3>
+                                        <p className="text-gray-600">Receive special giveaways and certificates</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </motion.div>
+                    </div>
+
+                    {/* Right Sidebar */}
+                    <div className="lg:col-span-1">
+                        <div className="bg-white border border-gray-200 rounded-lg p-6 sticky top-6 transition-all hover:shadow-md">
+                            <div className="mb-6">
+                                <p className="text-gray-500 mb-1">Price</p>
+                                <p className="text-3xl font-bold">₹{event.price?.toLocaleString()}</p>
+                            </div>
+
+                            {userData ? (
+                                <>
+                                    {isRegistered ? (
+                                        <Link to={`/my-ticket/${event.$id}`}>
+                                            <motion.button
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                                className="w-full bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 py-3 rounded-lg font-medium mb-6 transition-colors"
+                                            >
+                                                View My Ticket
+                                            </motion.button>
+                                        </Link>
+                                    ) : (
+                                        <Link to={`/book-event/${event.$id}`}>
+                                            <motion.button
+                                                whileHover={{ scale: 1.02, backgroundColor: "#2563EB" }}
+                                                whileTap={{ scale: 0.98 }}
+                                                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium mb-6 transition-colors shadow-sm hover:shadow"
+                                            >
+                                                Register
+                                            </motion.button>
+                                        </Link>
+                                    )}
+                                </>
+                            ) : (
+                                <Link to={`/book-event/${event.$id}`}>
+                                    <motion.button
+                                        whileHover={{ scale: 1.02, backgroundColor: "#2563EB" }}
+                                        whileTap={{ scale: 0.98 }}
+                                        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium mb-6 transition-colors shadow-sm hover:shadow"
+                                    >
+                                        Register
+                                    </motion.button>
+                                </Link>
+                            )}
+
+                            <div className="flex flex-wrap gap-2 mb-6">
+                                {["culture", "performance", "food"].map((tag) => (
+                                    <span key={tag} className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-800 hover:bg-gray-200 cursor-pointer transition-colors hover:text-gray-900">
+                                        {tag}
+                                    </span>
+                                ))}
+                            </div>
+
+                            {/* Location Section */}
+                            <div className="mb-6">
+                                <h3 className="text-lg font-semibold mb-2">Location</h3>
+                                <div className="bg-gray-100 rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer">
+                                    <p className="text-gray-800">{event.venue}</p>
+                                    <div className="mt-2 h-32 bg-gray-200 rounded-lg relative group overflow-hidden">
+                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/20 transition-opacity">
+                                            <FaSearch className="text-white text-xl" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Similar Events Section */}
+                            <div>
+                                <h3 className="text-lg font-semibold mb-2">Similar Events</h3>
+                                <p className="text-gray-500 text-sm">No similar events found</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            {/* Footer */}
+            <div className="bg-white border-t mt-16">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                        <div>
+                            <div className="flex items-center mb-4">
+                                <div className="text-blue-600 font-bold text-xl">EventX</div>
+                            </div>
+                            <p className="text-sm text-gray-600">
+                                EventX is the ultimate platform for college event management, ticket generation, and check-in services.
+                            </p>
+                        </div>
+                        <div>
+                            <h3 className="font-semibold mb-4">Discover</h3>
+                            <ul className="space-y-2 text-sm text-gray-600">
+                                {["Events", "Categories", "Organizers", "Venues"].map((item) => (
+                                    <li key={item} className="hover:text-blue-600 cursor-pointer transition-colors">{item}</li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 className="font-semibold mb-4">Company</h3>
+                            <ul className="space-y-2 text-sm text-gray-600">
+                                {["About Us", "Contact", "Careers", "Press"].map((item) => (
+                                    <li key={item} className="hover:text-blue-600 cursor-pointer transition-colors">{item}</li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 className="font-semibold mb-4">Support</h3>
+                            <ul className="space-y-2 text-sm text-gray-600">
+                                {["Help Center", "Terms of Service", "Privacy Policy", "FAQ"].map((item) => (
+                                    <li key={item} className="hover:text-blue-600 cursor-pointer transition-colors">{item}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                    <div className="mt-8 pt-8 border-t text-sm text-gray-600">
+                        © 2025 EventX. All rights reserved.
+                    </div>
+                </div>
+            </div>
+
+            {/* Image Modal - Full Screen */}
+            <AnimatePresence>
+                {showImageModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/95 backdrop-blur-sm z-50 flex items-center justify-center"
+                        onClick={(e) => e.target === e.currentTarget && setShowImageModal(false)}
+                    >
+                        <motion.div 
+                            className="relative w-full h-full flex flex-col items-center justify-center"
+                            initial={{ scale: 0.9 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0.9 }}
+                        >
+                            <button
+                                className="absolute top-4 right-4 p-3 bg-black/50 hover:bg-black/70 rounded-full transition-colors z-10"
+                                onClick={() => setShowImageModal(false)}
+                            >
+                                <FaTimes className="text-2xl text-white" />
+                            </button>
+                            <div className="w-full h-full flex items-center justify-center p-4">
+                                <img
+                                    src={appwriteService.getFilePreview(event.template)}
+                                    alt={event.title}
+                                    className="max-h-full max-w-full object-contain"
+                                />
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     )
 }

@@ -12,7 +12,7 @@ function Header() {
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
 
   const navItems = [
-    { name: 'Home', slug: '/', active: true },
+    { name: 'Events', slug: '/events', active: true },
     { 
       name: 'Login', 
       slug: '#',

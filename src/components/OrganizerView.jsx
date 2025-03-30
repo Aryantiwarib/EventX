@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import service from '../appwrite/config';
+import {Query } from "appwrite";
 
 const OrganizerView = ({ userId }) => {
     const [events, setEvents] = useState([]);
