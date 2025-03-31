@@ -19,6 +19,8 @@ import BookEvent from './BookingAndPayment/BookEvent.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import EventAttendees from './components/EventAttendees.jsx';
 import Support from './pages/Support.jsx';
+import WorkFlow from './pages/WorkFlow';
+import Notifications from './pages/Notifications.jsx';
 
 const router = createBrowserRouter([
   {
@@ -45,11 +47,11 @@ const router = createBrowserRouter([
         
       },
       {
-        path:"/about",
+        path:"/work-flow",
         element:(
           <AuthLayout authentication>
           {" "}
-        <PaymentComponents />
+        <WorkFlow />
         </AuthLayout>
         )
         
@@ -123,6 +125,15 @@ const router = createBrowserRouter([
       <AuthLayout authentication>
           {" "}
           <Support />
+      </AuthLayout>
+  ),
+},
+{
+  path: "/notifications",
+  element: (
+      <AuthLayout authentication>
+          {" "}
+          <Notifications />
       </AuthLayout>
   ),
 },

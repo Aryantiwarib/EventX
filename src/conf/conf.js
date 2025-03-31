@@ -5,7 +5,9 @@ const conf ={
     appwriteCollectionId:String(import.meta.env.VITE_APPWRITE_COLLECTION_ID),
     appwriteBucketId:String(import.meta.env.VITE_APPWRITE_BUCKET_ID),
     appwriteCollectionBookingId:String(import.meta.env.VITE_APPWRITE_COLLECTION_BOOKING_ID),
-    appwriteCollectionPaymentsId:String(import.meta.env.VITE_APPWRITE_COLLECTION_PAYMENTS_ID)
+    appwriteCollectionPaymentsId:String(import.meta.env.VITE_APPWRITE_COLLECTION_PAYMENTS_ID),
+    appwriteCollectionNotificationsId:String(import.meta.env.VITE_APPWRITE_COLLECTION_NOTIFICATIONS_ID),
+    appwriteCollectionNotificationsTemplatesId:String(import.meta.env.VITE_APPWRITE_COLLECTION_NOTIFICATIONS_TEMPLATES_ID)
 }
 
 
