@@ -9,8 +9,8 @@ import Signup from "./pages/Signup";
 import Home from "./pages/Home.jsx";
 import AuthLayout from "./components/AuthLayout/AuthLayout.jsx"
 import Login from "./pages/Login.jsx"
-import PaymentComponents from "./Features/PaymentComponents.tsx"
-import Scanner from "./Features/Scanner.jsx"
+// import PaymentComponents from "./Features/PaymentComponents.tsx"
+// import Scanner from "./Features/Scanner.jsx"
 import AllEvents from "./pages/AllEvents.jsx"
 import { AddEvent } from './components/index.js';
 import EventDetails from './pages/EventDetails.jsx';
@@ -21,6 +21,7 @@ import EventAttendees from './components/EventAttendees.jsx';
 import Support from './pages/Support.jsx';
 import WorkFlow from './pages/WorkFlow';
 import Notifications from './pages/Notifications.jsx';
+import PaymentHistory from './pages/PaymentHistory';
 
 const router = createBrowserRouter([
   {
@@ -137,6 +138,16 @@ const router = createBrowserRouter([
       </AuthLayout>
   ),
 },
+{
+  path: "/payment-history",
+  element: (
+      <AuthLayout authentication>
+          {" "}
+          <PaymentHistory />
+      </AuthLayout>
+  ),
+},
+
       
       
     ]

@@ -169,7 +169,7 @@ function Header() {
         setIsProfileDropdownOpen(false);
       }
     },
-    { name: 'Bookings', slug: '/bookings' },
+    { name: 'Payment History', slug: `/payment-history`},
     { name: 'Dashboard', slug: '/dashboard' },
   ];
 

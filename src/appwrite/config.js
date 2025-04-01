@@ -343,119 +343,118 @@ export class Service {
 
     async createNotificationTemplate(notification) {
         try {
-          return await this.databases.createDocument(
-            conf.appwriteDatabaseId,
-            conf.appwriteCollectionNotificationsTemplatesId,
-            ID.unique(),
-            {
-              title: notification.title,
-              description: notification.description,
-              eventType: notification.eventType,
-              actionUrl: notification.actionUrl,
-              eventId: notification.eventId,
-              isTemplate: true
-              // REMOVED: createdAt - Appwrite adds this automatically as $createdAt
-            }
-          );
-        } catch (error) {
-          console.error(`Appwrite :: createNotificationTemplate :: ${error}`);
-          throw error;
-        }
-      }
-
-      async createUserNotification(userId, notification) {
-        try {
-          return await this.databases.createDocument(
-            conf.appwriteDatabaseId,
-            conf.appwriteCollectionNotificationsId,
-            ID.unique(),
-            {
-              title: notification.title,
-              description: notification.description,
-              eventType: notification.eventType,
-              actionUrl: notification.actionUrl,
-              eventId: notification.eventId,
-              userId: userId,
-              isRead: false
-              // REMOVED: createdAt - Appwrite adds this automatically as $createdAt
-            }
-          );
-        } catch (error) {
-          console.error(`Appwrite :: createUserNotification :: ${error}`);
-          throw error;
-        }
-      }
-
-      async getUserNotifications(userId) {
-        try {
-          // First get user-specific notifications
-          const userNotifications = await this.databases.listDocuments(
-            conf.appwriteDatabaseId,
-            conf.appwriteCollectionNotificationsId,
-            [
-              Query.equal('userId', userId),
-              Query.orderDesc('$createdAt'),
-              Query.limit(100)
-            ]
-          );
-      
-          // Get template notifications
-          const templateNotifications = await this.databases.listDocuments(
-            conf.appwriteDatabaseId,
-            conf.appwriteCollectionNotificationsTemplatesId,
-            [
-              Query.equal('isTemplate', true),
-              Query.orderDesc('$createdAt'),
-              Query.limit(20)
-            ]
-          );
-      
-          // Check which templates haven't been converted to user notifications
-          const existingEventIds = new Set(userNotifications.documents.map(doc => doc.eventId));
-          const newTemplates = templateNotifications.documents.filter(template => 
-            !existingEventIds.has(template.eventId)
-          );
-      
-          // Create user copies of only new template notifications
-          if (newTemplates.length > 0) {
-            const copyPromises = newTemplates.map(template => 
-              this.createUserNotification(userId, {
-                title: template.title,
-                description: template.description,
-                eventType: template.eventType,
-                actionUrl: template.actionUrl,
-                eventId: template.eventId
-              })
+            return await this.databases.createDocument(
+                conf.appwriteDatabaseId,
+                conf.appwriteCollectionNotificationsTemplatesId,
+                ID.unique(),
+                {
+                    title: notification.title,
+                    description: notification.description,
+                    eventType: notification.eventType,
+                    actionUrl: notification.actionUrl,
+                    eventId: notification.eventId,
+                    isTemplate: true
+                    // REMOVED: createdAt - Appwrite adds this automatically as $createdAt
+                }
             );
-            await Promise.all(copyPromises);
-          }
-      
-          // Return final combined list
-          return await this.databases.listDocuments(
-            conf.appwriteDatabaseId,
-            conf.appwriteCollectionNotificationsId,
-            [
-              Query.equal('userId', userId),
-              Query.orderDesc('$createdAt'),
-              Query.limit(100)
-            ]
-          );
         } catch (error) {
-          console.error(`Appwrite :: getUserNotifications :: ${error}`);
-          throw error;
+            console.error(`Appwrite :: createNotificationTemplate :: ${error}`);
+            throw error;
         }
-      }
-
-
-
-    
-getLastNotificationDate(notifications) {
-    if (!notifications || notifications.length === 0) {
-      return '1970-01-01T00:00:00Z'; // Very old date if no notifications exist
     }
-    return notifications[0].$createdAt;
-  }
-      
+
+    async createUserNotification(userId, notification) {
+        try {
+            return await this.databases.createDocument(
+                conf.appwriteDatabaseId,
+                conf.appwriteCollectionNotificationsId,
+                ID.unique(),
+                {
+                    title: notification.title,
+                    description: notification.description,
+                    eventType: notification.eventType,
+                    actionUrl: notification.actionUrl,
+                    eventId: notification.eventId,
+                    userId: userId,
+                    isRead: false
+                    // REMOVED: createdAt - Appwrite adds this automatically as $createdAt
+                }
+            );
+        } catch (error) {
+            console.error(`Appwrite :: createUserNotification :: ${error}`);
+            throw error;
+        }
+    }
+
+    async getUserNotifications(userId) {
+        try {
+            // First get user-specific notifications
+            const userNotifications = await this.databases.listDocuments(
+                conf.appwriteDatabaseId,
+                conf.appwriteCollectionNotificationsId,
+                [
+                    Query.equal('userId', userId),
+                    Query.orderDesc('$createdAt'),
+                    Query.limit(100)
+                ]
+            );
+
+            // Get template notifications
+            const templateNotifications = await this.databases.listDocuments(
+                conf.appwriteDatabaseId,
+                conf.appwriteCollectionNotificationsTemplatesId,
+                [
+                    Query.equal('isTemplate', true),
+                    Query.orderDesc('$createdAt'),
+                    Query.limit(20)
+                ]
+            );
+
+            // Check which templates haven't been converted to user notifications
+            const existingEventIds = new Set(userNotifications.documents.map(doc => doc.eventId));
+            const newTemplates = templateNotifications.documents.filter(template =>
+                !existingEventIds.has(template.eventId)
+            );
+
+            // Create user copies of only new template notifications
+            if (newTemplates.length > 0) {
+                const copyPromises = newTemplates.map(template =>
+                    this.createUserNotification(userId, {
+                        title: template.title,
+                        description: template.description,
+                        eventType: template.eventType,
+                        actionUrl: template.actionUrl,
+                        eventId: template.eventId
+                    })
+                );
+                await Promise.all(copyPromises);
+            }
+
+            // Return final combined list
+            return await this.databases.listDocuments(
+                conf.appwriteDatabaseId,
+                conf.appwriteCollectionNotificationsId,
+                [
+                    Query.equal('userId', userId),
+                    Query.orderDesc('$createdAt'),
+                    Query.limit(100)
+                ]
+            );
+        } catch (error) {
+            console.error(`Appwrite :: getUserNotifications :: ${error}`);
+            throw error;
+        }
+    }
+
+
+
+    getLastNotificationDate(notifications) {
+        if (!notifications || notifications.length === 0) {
+            return '1970-01-01T00:00:00Z'; // Very old date if no notifications exist
+        }
+        return notifications[0].$createdAt;
+    }
+
 
     async markNotificationAsRead(notificationId) {
         try {
@@ -502,9 +501,6 @@ getLastNotificationDate(notifications) {
             throw error;
         }
     }
-
-
-
 
 }
 
