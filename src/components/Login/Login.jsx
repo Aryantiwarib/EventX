@@ -20,7 +20,7 @@ function Login({ isOpen, onClose, openSignupModal }) {
         const userData = await authService.getCurrentUser();
         if (userData) dispatch(authLogin(userData));
         navigate('/');
-        onClose(); // Close the modal after successful login
+        onClose();
       }
     } catch (error) {
       setError(error.message);
@@ -29,13 +29,11 @@ function Login({ isOpen, onClose, openSignupModal }) {
 
   return (
     <>
-      {/* Modal Overlay */}
       {isOpen && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
-          {/* Modal Content */}
+        <div className='fixed inset-0 flex items-center justify-center z-50'>
           <div className='bg-white rounded-lg p-8 w-full max-w-md mx-4 shadow-lg'>
             <div className='mb-4 flex justify-center'>
-              <Logo width='70px' /> {/* Add Logo */}
+              <Logo width='70px' />
             </div>
             <div className='mb-4 flex justify-between items-center'>
               <h2 className='text-2xl font-bold'>Sign In</h2>
@@ -47,10 +45,8 @@ function Login({ isOpen, onClose, openSignupModal }) {
               </button>
             </div>
 
-            {/* Error Message */}
             {error && <p className='text-red-600 mb-4 text-center'>{error}</p>}
 
-            {/* Login Form */}
             <form onSubmit={handleSubmit(login)} className='space-y-4'>
               <Input
                 label='Email: '
@@ -78,7 +74,6 @@ function Login({ isOpen, onClose, openSignupModal }) {
               </Button>
             </form>
 
-            {/* Sign Up Link */}
             <p className='mt-4 text-center text-gray-600'>
               Don&apos;t have an account?{' '}
               <button

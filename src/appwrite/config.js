@@ -502,7 +502,35 @@ export class Service {
         }
     }
 
-}
 
+
+
+
+
+
+
+
+    //// some additional 
+
+    async getUserBookings(userId) {
+        // This is just a wrapper for your existing method with the name you're using elsewhere
+        return this.getBookingsByUser(userId);
+    }
+
+    // Method to get a single booking by ID (also needed based on ViewTicket.js)
+    async getBooking(bookingId) {
+        try {
+            return await this.databases.getDocument(
+                conf.appwriteDatabaseId,
+                conf.appwriteCollectionBookingId,
+                bookingId
+            );
+        } catch (error) {
+            console.error(`Appwrite :: getBooking :: ${error}`);
+            throw error;
+        }
+    }
+
+}
 const service = new Service();
 export default service;

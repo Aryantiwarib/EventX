@@ -1,236 +1,144 @@
-// import React, { useEffect, useState } from 'react';
-// import { motion, AnimatePresence } from 'framer-motion';
-// import { useNavigate } from 'react-router-dom';
-
-// const Home = () => {
-//   const navigate = useNavigate();
-//   const [activeCategory, setActiveCategory] = useState(null);
-
-//   useEffect(() => {
-//     const observer = new IntersectionObserver(
-//       (entries) => {
-//         entries.forEach((entry) => {
-//           if (entry.isIntersecting) {
-//             entry.target.classList.add('fade-in');
-//           }
-//         });
-//       },
-//       { threshold: 0.1 }
-//     );
-
-//     document.querySelectorAll('.animate-on-scroll').forEach((section) => {
-//       observer.observe(section);
-//     });
-
-//     // Particle background effect
-//     const createParticles = () => {
-//       const container = document.getElementById('particle-container');
-//       for (let i = 0; i < 50; i++) {
-//         const particle = document.createElement('div');
-//         particle.classList.add('particle');
-//         particle.style.left = `${Math.random() * 100}%`;
-//         particle.style.top = `${Math.random() * 100}%`;
-//         particle.style.animationDuration = `${Math.random() * 10 + 5}s`;
-//         container.appendChild(particle);
-//       }
-//     };
-
-//     createParticles();
-//   }, []);
-
-//   const handleCardClick = (event) => {
-//     navigate(event === "events" ? "/events" : `/event/${event}`);
-//   };
-
-//   const eventCategories = [
-//     { 
-//       icon: '🎵', 
-//       name: 'Music', 
-//       color: '#7DD3FC', 
-//       description: 'Concerts & Open Mics',
-//       details: 'Discover live performances, jam sessions, and musical talents from across campus.'
-//     },
-//     { 
-//       icon: '💻', 
-//       name: 'Tech', 
-//       color: '#BAE6FD', 
-//       description: 'Hackathons & Workshops',
-//       details: 'Innovative coding challenges, tech talks, and hands-on learning experiences.'
-//     },
-//     { 
-//       icon: '⚽', 
-//       name: 'Sports', 
-//       color: '#7DD3FC', 
-//       description: 'Tournaments & Matches',
-//       details: 'Competitive sports events, inter-college tournaments, and fitness challenges.'
-//     },
-//     { 
-//       icon: '🎭', 
-//       name: 'Cultural', 
-//       color: '#BAE6FD', 
-//       description: 'Festivals & Exhibitions',
-//       details: 'Celebrate diversity through art, dance, theater, and cultural showcases.'
-//     }
-//   ];
-
-//   return (
-//     <div className="font-sans overflow-hidden relative">
-//       {/* Particle Background */}
-//       <div 
-//         id="particle-container" 
-//         className="fixed inset-0 pointer-events-none z-0 opacity-10"
-//         style={{
-//           background: 'radial-gradient(circle, rgba(13,110,253,0.1) 0%, rgba(125,211,252,0.1) 100%)'
-//         }}
-//       />
-
-//       {/* Modern Hero Section */}
-//       <section className="min-h-screen relative bg-white z-10">
-//         <div className="absolute inset-0 overflow-hidden">
-//           <div className="absolute w-[200%] h-[150%] -top-1/2 -left-1/2 bg-[#F0F9FF] transform rotate-[15deg]"></div>
-//         </div>
-
-//         <div className="container mx-auto px-4 pt-32 relative z-20">
-//           <motion.div 
-//             initial={{ opacity: 0, y: 50 }}
-//             animate={{ opacity: 1, y: 0 }}
-//             transition={{ duration: 0.8 }}
-//             className="max-w-2xl"
-//           >
-//             <h1 className="text-5xl md:text-7xl font-bold mb-6 text-[#0369A1] leading-tight">
-//               Campus Life <br />
-//               <span className="text-[#7DD3FC]">Reimagined</span>
-//             </h1>
-//             <p className="text-xl text-gray-600 mb-8">
-//               Transform your college experience through engaging, inspiring, and unforgettable events.
-//             </p>
-//             <button
-//               className="px-8 py-4 rounded-full text-lg font-semibold bg-gradient-to-r from-[#0369A1] to-[#7DD3FC] text-white hover:from-[#075985] hover:to-[#7DD3FC] transition-all transform hover:scale-105 shadow-lg"
-//               onClick={() => handleCardClick("events")}
-//             >
-//               Discover Your Journey
-//             </button>
-//           </motion.div>
-//         </div>
-//       </section>
-
-//       {/* Enhanced Event Categories Section */}
-//       <section className="py-24 bg-[#F0F9FF] animate-on-scroll relative z-20">
-//         <div className="container mx-auto px-4">
-//           <motion.h2 
-//             initial={{ opacity: 0, y: 50 }}
-//             whileInView={{ opacity: 1, y: 0 }}
-//             className="text-4xl font-bold text-center mb-16 text-[#0369A1]"
-//           >
-//             Explore Event Categories
-//           </motion.h2>
-
-//           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
-//             {eventCategories.map((category, index) => (
-//               <motion.div
-//                 key={index}
-//                 initial={{ scale: 0.9, opacity: 0 }}
-//                 whileInView={{ scale: 1, opacity: 1 }}
-//                 whileHover={{ scale: 1.05 }}
-//                 onHoverStart={() => setActiveCategory(category)}
-//                 onHoverEnd={() => setActiveCategory(null)}
-//                 className="group cursor-pointer perspective-1000"
-//               >
-//                 <div className="relative h-64 transform-style-preserve-3d transition-transform duration-500">
-//                   <div className="absolute inset-0 bg-white rounded-3xl p-6 shadow-lg flex flex-col items-center justify-center backface-hidden">
-//                     <div className="text-6xl mb-4">{category.icon}</div>
-//                     <h3 className="text-2xl font-bold text-[#0369A1]">{category.name}</h3>
-//                   </div>
-//                 </div>
-//               </motion.div>
-//             ))}
-//           </div>
-
-//           <AnimatePresence>
-//             {activeCategory && (
-//               <motion.div
-//                 initial={{ opacity: 0, y: 20 }}
-//                 animate={{ opacity: 1, y: 0 }}
-//                 exit={{ opacity: 0, y: 20 }}
-//                 className="mt-8 text-center"
-//               >
-//                 <p className="text-xl text-[#0369A1] font-semibold">
-//                   {activeCategory.description}
-//                 </p>
-//                 <p className="text-gray-600 max-w-2xl mx-auto mt-4">
-//                   {activeCategory.details}
-//                 </p>
-//                 <button
-//                   className="mt-6 px-6 py-3 rounded-full bg-[#0369A1] text-white hover:bg-[#075985] transition-colors"
-//                   onClick={() => handleCardClick(activeCategory.name.toLowerCase())}
-//                 >
-//                   Explore {activeCategory.name} Events
-//                 </button>
-//               </motion.div>
-//             )}
-//           </AnimatePresence>
-//         </div>
-//       </section>
-
-//       {/* Interactive CTA Section */}
-//       <section className="py-24 bg-white animate-on-scroll relative z-20">
-//         <div className="container mx-auto px-4">
-//           <div className="bg-gradient-to-r from-[#0369A1] to-[#7DD3FC] rounded-[4rem] p-12 text-center relative overflow-hidden">
-//             <motion.h2 
-//               initial={{ opacity: 0, y: 20 }}
-//               whileInView={{ opacity: 1, y: 0 }}
-//               className="text-4xl font-bold text-white mb-6"
-//             >
-//               Your Campus, Your Adventure
-//             </motion.h2>
-//             <p className="text-white/90 mb-8 max-w-2xl mx-auto">
-//               Connect, learn, and grow. Be part of a vibrant community that celebrates every moment.
-//             </p>
-//             <button
-//               className="px-8 py-4 rounded-full bg-white text-[#0369A1] font-semibold hover:bg-gray-100 transition-colors transform hover:scale-105"
-//               onClick={() => handleCardClick("events")}
-//             >
-//               Start Your Journey
-//             </button>
-//           </div>
-//         </div>
-//       </section>
-//     </div>
-//   );
-// };
-
-// export default Home;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-///////////////////// new Design ///////////
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, ChevronRight, Calendar, Ticket, CheckSquare, BarChart2 } from 'lucide-react';
-import img1 from "../../Images/img1.avif"
-import img2 from "../../Images/img2.avif"
-import img3 from "../../Images/img3.jpeg"
-import img4 from "../../Images/img4.avif"
+import service from '../../appwrite/config'; // Import your service
+import { FaCalendarAlt, FaMapMarkerAlt, FaUsers, FaClock } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
+  const [featuredEvent, setFeaturedEvent] = useState(null);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        
+        // Get all active events
+        const response = await service.getEvents();
+        const events = response.documents;
+        
+        if (events.length > 0) {
+          // Find workshop event for featured section (or fall back to cultural or sports)
+          const workshopEvent = events.find(event => 
+            event.category.toLowerCase() === 'workshop'
+          );
+          
+          const culturalEvent = events.find(event => 
+            event.category.toLowerCase() === 'cultural'
+          );
+          
+          const sportsEvent = events.find(event => 
+            event.category.toLowerCase() === 'sports'
+          );
+          
+          // Select featured event based on priority
+          const selectedFeaturedEvent = workshopEvent || culturalEvent || sportsEvent || events[0];
+          setFeaturedEvent(selectedFeaturedEvent);
+          
+          // Get top 3 events for the upcoming events section
+          // (excluding the featured event to avoid duplication)
+          const topEvents = events
+            .filter(event => event.$id !== selectedFeaturedEvent.$id)
+            .sort((a, b) => new Date(a.date) - new Date(b.date))
+            .slice(0, 3);
+            
+          setUpcomingEvents(topEvents);
+        }
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  // Helper function to format date like in EventCard
+  const formatDate = (dateString) => {
+    const options = { day: 'numeric', month: 'short' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+  };
+
+  // Helper function to get year from date
+  const getYear = (dateString) => {
+    return new Date(dateString).getFullYear();
+  };
+
+  // Helper function to extract time from date
+  const formatTime = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  // Helper function to get image URL or fallback to placeholder
+  const getEventImageUrl = (event) => {
+    if (event && event.template) {
+      return service.getFilePreview(event.template); // Use appwrite's file preview
+    }
+    // Default placeholder if no image is available
+    return "/placeholder-event.jpg";
+  };
+
+  // Helper function to parse description like in EventCard
+  const parseDescription = (description) => {
+    if (!description) return 'Join us for this exciting event!';
+    
+    try {
+      // If stored as JSON string, parse it
+      const content = typeof description === 'string' ? 
+        JSON.parse(description) : description;
+          
+      // Check if it's Delta format (Quill) or simple HTML
+      if (content.ops) {
+        // For Quill Delta format
+        return content.ops
+          .map(op => op.insert)
+          .join('')
+          .substring(0, 150) + '...';
+      } else if (typeof content === 'string') {
+        // For HTML string content
+        return content.substring(0, 150) + '...';
+      } else {
+        // For other formats
+        return 'Join us for this exciting event!';
+      }
+    } catch (error) {
+      // If it's not JSON, assume it's plain text or HTML
+      return description.substring(0, 150) + '...';
+    }
+  };
+
+  // Create plain text version for cards
+  const createPlainText = (htmlContent) => {
+    if (!htmlContent) return '';
+    
+    // Create a temporary div to extract text from HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlContent;
+    const textContent = tempDiv.textContent || tempDiv.innerText || '';
+    
+    return textContent.length > 120 ? 
+      textContent.substring(0, 120) + '...' : 
+      textContent;
+  };
+
+  // Price display logic
+  const getPriceDisplay = (price) => {
+    return price > 0 ? `₹${price}` : "Free";
+  };
+
+  // category handl karne ka function
+
+  const handleCategoryChange = (category) => {
+    // if(category === "technology") {
+      navigate(`/events/${category}`);
+    // }
+
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       <main className="flex-1">
@@ -263,36 +171,55 @@ const Home = () => {
           
           {/* Category Pills */}
           <div className="flex flex-wrap justify-center gap-2 mb-12">
-            <button className="px-4 py-1 bg-gray-900 text-white rounded-full hover:bg-black transition-colors">Technology</button>
-            <button className="px-4 py-1 bg-white border rounded-full hover:bg-gray-100 transition-colors">Cultural</button>
-            <button className="px-4 py-1 bg-white border rounded-full hover:bg-gray-100 transition-colors">Career</button>
-            <button className="px-4 py-1 bg-white border rounded-full hover:bg-gray-100 transition-colors">Sports</button>
-            <button className="px-4 py-1 bg-white border rounded-full hover:bg-gray-100 transition-colors">Academic</button>
-            <button className="px-4 py-1 bg-white border rounded-full hover:bg-gray-100 transition-colors">Workshop</button>
+            <button
+            onClick={() => handleCategoryChange("technology")}
+             className="px-4 py-1 bg-gray-900 text-white rounded-full hover:bg-black transition-colors">Technology</button>
+            <button
+            onClick={() => handleCategoryChange("cultural")} className="px-4 py-1 bg-white border rounded-full hover:bg-gray-100 transition-colors">Cultural</button>
+            <button
+            onClick={() => handleCategoryChange("career")}
+             className="px-4 py-1 bg-white border rounded-full hover:bg-gray-100 transition-colors">Career</button>
+            <button
+            onClick={() => handleCategoryChange("sports")}
+             className="px-4 py-1 bg-white border rounded-full hover:bg-gray-100 transition-colors">Sports</button>
+            <button
+            onClick={() => handleCategoryChange("academic")}
+             className="px-4 py-1 bg-white border rounded-full hover:bg-gray-100 transition-colors">Academic</button>
+            <button
+            onClick={() => handleCategoryChange("workshop")}
+             className="px-4 py-1 bg-white border rounded-full hover:bg-gray-100 transition-colors">Workshop</button>
           </div>
         </section>
 
-        {/* Featured Event Banner - INCREASED SIZE */}
+        {/* Featured Event Banner */}
         <section className="mx-4 md:mx-8 lg:mx-auto lg:max-w-6xl mb-16">
-          <div className="relative rounded-xl overflow-hidden bg-black shadow-lg transition-transform hover:scale-[1.01] cursor-pointer">
-            <img 
-              src={img1}
-              alt="Annual Tech Summit" 
-              className="w-full h-80 md:h-96 object-cover opacity-70"
-            />
-            <div className="absolute bottom-0 left-0 p-8 text-white">
-              <div className="inline-block bg-blue-500 text-xs px-2 py-1 rounded mb-2">
-                Featured Event
+          {loading ? (
+            <div className="h-80 md:h-96 bg-gray-200 rounded-xl animate-pulse"></div>
+          ) : featuredEvent ? (
+            <div className="relative rounded-xl overflow-hidden bg-black shadow-lg transition-transform hover:scale-[1.01] cursor-pointer">
+              <img 
+                src={getEventImageUrl(featuredEvent)} 
+                alt={featuredEvent.title} 
+                className="w-full h-80 md:h-96 object-cover opacity-70"
+              />
+              <div className="absolute bottom-0 left-0 p-8 text-white">
+                <div className="inline-block bg-blue-500 text-xs px-2 py-1 rounded mb-2">
+                  Featured Event
+                </div>
+                <h2 className="text-2xl md:text-4xl font-bold mb-2">{featuredEvent.title}</h2>
+                <p className="mb-4 max-w-lg text-lg">
+                  {createPlainText(parseDescription(featuredEvent.description))}
+                </p>
+                <button className="bg-blue-500 text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-blue-600 transition-colors group">
+                  Learn More <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                </button>
               </div>
-              <h2 className="text-2xl md:text-4xl font-bold mb-2">Annual Tech Summit</h2>
-              <p className="mb-4 max-w-lg text-lg">
-                Join us for the biggest tech event of the year. Learn from industry experts, network with peers, and explore cutting-edge technologies.
-              </p>
-              <button className="bg-blue-500 text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-blue-600 transition-colors group">
-                Learn More <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
-              </button>
             </div>
-          </div>
+          ) : (
+            <div className="h-80 md:h-96 bg-gray-100 rounded-xl flex items-center justify-center">
+              <p className="text-gray-500">No featured event available</p>
+            </div>
+          )}
         </section>
 
         {/* Features Section */}
@@ -348,7 +275,7 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Upcoming Events Section - LARGER CARDS WITHOUT HOVER OVERLAY */}
+        {/* Upcoming Events Section - Updated to match EventCard style */}
         <section className="py-12 px-4 bg-gray-50">
           <div className="max-w-6xl mx-auto">
             <div className="flex justify-between items-center mb-8">
@@ -357,108 +284,109 @@ const Home = () => {
                 <h2 className="text-3xl font-bold">Discover Events</h2>
                 <p className="text-gray-600">Find and register for the best events happening around your campus.</p>
               </div>
-              <a href="#" className="flex items-center text-blue-500 hover:underline group">
+              <a href="/events" className="flex items-center text-blue-500 hover:underline group">
                 View All Events <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </a>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Cultural Night Card */}
-              <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer">
-                <div className="relative">
-                  <img src={img2} alt="Cultural Night" className="w-full h-56 object-cover transition-transform duration-500 hover:scale-105" />
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-gray-500">Cultural</span>
-                    <span className="text-sm text-gray-500">Free</span>
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="bg-white rounded-lg overflow-hidden shadow-md">
+                    <div className="h-48 bg-gray-200 animate-pulse"></div>
+                    <div className="p-6">
+                      <div className="h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
+                      <div className="h-6 bg-gray-200 rounded animate-pulse mb-2"></div>
+                      <div className="h-16 bg-gray-200 rounded animate-pulse mb-4"></div>
+                      <div className="h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                    </div>
                   </div>
-                  <h3 className="font-bold text-xl mb-2">Cultural Night</h3>
-                  <p className="text-gray-600 mb-4">
-                    Experience diverse cultures through performances, food, and music. Join us for a night to celebrate our global community.
-                  </p>
-                  <div className="flex items-center text-sm text-gray-500 mb-2">
-                    <Calendar size={14} className="mr-1" /> Nov 25, 2023
-                    <span className="mx-2">•</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <polyline points="12 6 12 12 16 14"></polyline>
-                    </svg> 7 PM
-                  </div>
-                  <div className="flex items-center text-sm text-gray-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                      <circle cx="12" cy="10" r="3"></circle>
-                    </svg> College Grounds
-                    <span className="ml-4">450 attending</span>
-                  </div>
-                </div>
+                ))}
               </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {upcomingEvents.length > 0 ? (
+                  upcomingEvents.map((event) => (
+                    <a key={event.$id} href={`/events/${event.$id}`} className="block group">
+                      <div className="w-full bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 h-full border border-gray-100">
+                        <div className="flex flex-col h-full">
+                          {/* Image Section */}
+                          <div className="relative overflow-hidden h-48">
+                            <img 
+                              src={getEventImageUrl(event)}
+                              alt={event.title}
+                              className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                            />
+                            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            
+                            {/* Price Tag */}
+                            <div className="absolute top-3 right-3">
+                              <span className={`${event.price > 0 ? 'bg-blue-600 text-white' : 'bg-green-500 text-white'} px-3 py-1 rounded-full text-sm font-medium`}>
+                                {getPriceDisplay(event.price)}
+                              </span>
+                            </div>
+                            
+                            {/* Category Badge */}
+                            <div className="absolute bottom-3 left-3">
+                              <span className="bg-white/90 px-3 py-1 rounded-full text-sm font-medium text-gray-700">
+                                {event.category}
+                              </span>
+                            </div>
+                          </div>
 
-              {/* Hackathon Card */}
-              <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer">
-                <div className="relative">
-                  <img src={img3} alt="Hackathon 2023" className="w-full h-56 object-cover transition-transform duration-500 hover:scale-105" />
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-gray-500">Technology</span>
-                    <span className="text-sm text-gray-500">Free</span>
+                          {/* Content Section */}
+                          <div className="flex flex-col justify-between p-4 flex-grow">
+                            <div>
+                              {/* Title */}
+                              <h3 className="text-lg font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
+                                {event.title}
+                              </h3>
+                              
+                              {/* Description */}
+                              <p className="text-gray-600 text-sm mb-3 line-clamp-3">
+                                {createPlainText(parseDescription(event.description)) || 'Join us for this exciting event!'}
+                              </p>
+                            </div>
+                            
+                            {/* Event Details */}
+                            <div className="space-y-2 text-sm text-gray-600 mt-auto">
+                              {/* Date */}
+                              <div className="flex items-center gap-2">
+                                <FaCalendarAlt className="text-blue-500" />
+                                <span>{formatDate(event.date)} • {getYear(event.date)}</span>
+                              </div>
+                              
+                              {/* Time */}
+                              <div className="flex items-center gap-2">
+                                <FaClock className="text-blue-500" />
+                                <span>{formatTime(event.date)}</span>
+                              </div>
+                              
+                              {/* Location */}
+                              <div className="flex items-center gap-2">
+                                <FaMapMarkerAlt className="text-blue-500" />
+                                <span className="truncate">{event.venue}</span>
+                              </div>
+                              
+                              {/* Attendees */}
+                              <div className="flex items-center gap-2">
+                                <FaUsers className="text-blue-500" />
+                                <span>{event.attendees ? event.attendees.split(',').length : 0} attending</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                  ))
+                ) : (
+                  <div className="col-span-3 text-center py-12">
+                    <p className="text-gray-500">No upcoming events found</p>
                   </div>
-                  <h3 className="font-bold text-xl mb-2">Hackathon 2023</h3>
-                  <p className="text-gray-600 mb-4">
-                    48 hours of coding, creativity, and collaboration. Solve real-world problems and compete for exciting prizes.
-                  </p>
-                  <div className="flex items-center text-sm text-gray-500 mb-2">
-                    <Calendar size={14} className="mr-1" /> Dec 8, 2023
-                    <span className="mx-2">•</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <polyline points="12 6 12 12 16 14"></polyline>
-                    </svg> 7 PM
-                  </div>
-                  <div className="flex items-center text-sm text-gray-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                      <circle cx="12" cy="10" r="3"></circle>
-                    </svg> Computer Science Building
-                    <span className="ml-4">120 attending</span>
-                  </div>
-                </div>
+                )}
               </div>
-
-              {/* Career Fair Card */}
-              <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer">
-                <div className="relative">
-                  <img src={img4} alt="Career Fair" className="w-full h-56 object-cover transition-transform duration-500 hover:scale-105" />
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-gray-500">Career</span>
-                    <span className="text-sm text-gray-500">Free</span>
-                  </div>
-                  <h3 className="font-bold text-xl mb-2">Career Fair</h3>
-                  <p className="text-gray-600 mb-4">
-                    Connect with top employers, explore internship and job opportunities, and attend resume workshops.
-                  </p>
-                  <div className="flex items-center text-sm text-gray-500 mb-2">
-                    <Calendar size={14} className="mr-1" /> Nov 15, 2023
-                    <span className="mx-2">•</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <polyline points="12 6 12 12 16 14"></polyline>
-                    </svg> 10 AM
-                  </div>
-                  <div className="flex items-center text-sm text-gray-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                      <circle cx="12" cy="10" r="3"></circle>
-                    </svg> Main Hall
-                    <span className="ml-4">500 attending</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </section>
 

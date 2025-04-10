@@ -12,9 +12,9 @@ function Signup({ isOpen, onClose, openLoginModal }) {
   const { register, handleSubmit } = useForm();
   const [error, setError] = useState('');
   const [send, setSend] = useState(false);
-  const [userId, setUserId] = useState(''); // Store userId for OTP verification
-  const [formData, setFormData] = useState({}); // Store form data for account creation
-  const [successMessage, setSuccessMessage] = useState(''); // Store success message
+  const [userId, setUserId] = useState('');
+  const [formData, setFormData] = useState({});
+  const [successMessage, setSuccessMessage] = useState('');
 
   const create = async (data) => {
     setError('');
@@ -25,9 +25,9 @@ function Signup({ isOpen, onClose, openLoginModal }) {
         if (userData) dispatch(authLogin(userData));
         setSuccessMessage('You have registered successfully!');
         setTimeout(() => {
-          onClose(); // Close the modal after successful signup
-          navigate('/'); // Redirect to home page
-        }, 2000); // Close after 2 seconds
+          onClose();
+          navigate('/');
+        }, 2000);
       }
     } catch (error) {
       setError(error.message);
@@ -39,8 +39,8 @@ function Signup({ isOpen, onClose, openLoginModal }) {
     try {
       const token = await authService.SendOtp(data);
       if (token) {
-        setUserId(token.userId); // Store userId for OTP verification
-        setFormData(data); // Store form data for account creation
+        setUserId(token.userId);
+        setFormData(data);
         setSend(true);
       }
     } catch (error) {
@@ -53,7 +53,6 @@ function Signup({ isOpen, onClose, openLoginModal }) {
     try {
       const verification = await authService.verifyOtp(userId, data.otp);
       if (verification) {
-        // If OTP is verified, proceed with account creation
         await create({ ...formData, password: data.password });
       }
     } catch (error) {
@@ -63,13 +62,11 @@ function Signup({ isOpen, onClose, openLoginModal }) {
 
   return (
     <>
-      {/* Modal Overlay */}
       {isOpen && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
-          {/* Modal Content */}
+        <div className='fixed inset-0 flex items-center justify-center z-50'>
           <div className='bg-white rounded-lg p-8 w-full max-w-md mx-4 shadow-lg'>
             <div className='mb-4 flex justify-center'>
-              <Logo width='70px' /> {/* Add Logo */}
+              <Logo width='70px' />
             </div>
             <div className='mb-4 flex justify-between items-center'>
               <h2 className='text-2xl font-bold'>Sign Up</h2>
@@ -81,15 +78,11 @@ function Signup({ isOpen, onClose, openLoginModal }) {
               </button>
             </div>
 
-            {/* Error Message */}
             {error && <p className='text-red-600 mb-4 text-center'>{error}</p>}
-
-            {/* Success Message */}
             {successMessage && (
               <p className='text-green-600 mb-4 text-center'>{successMessage}</p>
             )}
 
-            {/* Signup Form */}
             {!send ? (
               <form onSubmit={handleSubmit(SENDOTP)} className='space-y-4'>
                 <Input
@@ -141,7 +134,6 @@ function Signup({ isOpen, onClose, openLoginModal }) {
               </form>
             )}
 
-            {/* Login Link */}
             <p className='mt-4 text-center text-gray-600'>
               Already have an account?{' '}
               <button

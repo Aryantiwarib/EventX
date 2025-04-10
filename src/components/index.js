@@ -5,13 +5,14 @@ import LogoutBtn from "./Header/LogoutBtn.jsx"
 import Logo from "./Logo/Logo.jsx"
 import Login from "./Login/Login.jsx"
 import Signup from "./Singup/Signup.jsx"
-import Container from "./container/Container.jsx"
+import Container from "./Container/Container.jsx"
 import Button from "./Button.jsx";
 import Input from "./Input.jsx"
 import AddEvent from "./AddEvent/AddEvent.jsx"
 import Select from "./Select.jsx"
 import RTE from "./RTE.jsx"
 import EventCard  from "./EventCard.jsx"
+import Loader from "./Loader.jsx"
 
 
 export {
@@ -29,5 +30,6 @@ export {
     Select,
     RTE,
     EventCard,
+    Loader,
  
 }

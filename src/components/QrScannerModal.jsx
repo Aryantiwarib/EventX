@@ -31,20 +31,13 @@ const QrScannerModal = ({ eventId, attendees, onScanSuccess, onClose }) => {
     }, []);
 
     const handleScan = async (data) => {
-        if (!data) {
-            // No QR code detected
-            setScanStatus('scanning');
+        if (!data || !data.text) {
+            // No QR code detected or no text in QR code
             return;
         }
 
         try {
-            setScanResult(null);
-
-            if (!data || typeof data.text !== 'string') {
-                setScanStatus('ready');
-                return;
-            }
-            
+            console.log("QR Scan Result:", data.text); // Debug log
             const text = data.text.trim();
 
             if (!text) {
@@ -56,20 +49,47 @@ const QrScannerModal = ({ eventId, attendees, onScanSuccess, onClose }) => {
                 return;
             }
 
-            if (!(text.startsWith('{') && text.endsWith('}'))) {
-                throw new Error('Invalid QR format - not JSON');
+            // Try to parse as JSON
+            let scannedData;
+            try {
+                scannedData = JSON.parse(text);
+            } catch (e) {
+                console.error("Failed to parse QR data:", e);
+                throw new Error('Invalid QR format - not valid JSON');
             }
-
-            const scannedData = JSON.parse(text);
             
             // Validation checks
-            if (!scannedData?.bookingId || !scannedData?.eventId) {
-                throw new Error('Missing required fields in QR code');
+            if (!scannedData?.bookingId) {
+                throw new Error('Missing booking ID in QR code');
             }
 
+            console.log("Looking for booking ID:", scannedData.bookingId);
+            console.log("Available attendees:", attendees.map(a => a.$id));
+            
+            // Find attendee by booking ID
             const attendee = attendees.find(a => a.$id === scannedData.bookingId);
-            if (!attendee) throw new Error('Attendee not found');
-            if (attendee.status === 'checkedIn') throw new Error('Already checked in');
+            
+            // Check if attendee exists
+            if (!attendee) {
+                throw new Error('Attendee not found in the list');
+            }
+            
+            // Check if already checked in
+            if (attendee.status === 'checkedIn') {
+                setScanResult({
+                    name: attendee.ticketHolderName,
+                    status: 'warning',
+                    message: 'Already checked in'
+                });
+                setScanStatus('error');
+                
+                setTimeout(() => {
+                    setScanStatus('ready');
+                    setScanResult(null);
+                }, 2000);
+                
+                return;
+            }
 
             // Successful scan
             setScanResult({
@@ -78,6 +98,8 @@ const QrScannerModal = ({ eventId, attendees, onScanSuccess, onClose }) => {
             });
             setScanStatus('success');
             
+            // Call onScanSuccess with the booking ID
+            console.log("Calling onScanSuccess with:", scannedData.bookingId);
             onScanSuccess(scannedData.bookingId);
 
             // Reset after 2 seconds
@@ -87,9 +109,10 @@ const QrScannerModal = ({ eventId, attendees, onScanSuccess, onClose }) => {
             }, 2000);
 
         } catch (error) {
+            console.error("Scan error:", error);
             setScanResult({
                 status: 'error',
-                message: error.message.replace('JSON.parse:', '').trim()
+                message: error.message || 'Unknown error'
             });
             setScanStatus('error');
             
@@ -145,7 +168,15 @@ const QrScannerModal = ({ eventId, attendees, onScanSuccess, onClose }) => {
                                 }}
                             />
 
-                            {/* ... [keep scanning overlay and other elements] ... */}
+                            {/* Scanning overlay */}
+                            {scanStatus === 'ready' && (
+                                <div className="absolute inset-0 pointer-events-none">
+                                    <div className="absolute inset-0 border-2 border-white/30 rounded-lg"></div>
+                                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                                        <ViewfinderCircleIcon className="w-32 h-32 text-white/40" />
+                                    </div>
+                                </div>
+                            )}
                         </>
                     ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-500">
@@ -156,12 +187,19 @@ const QrScannerModal = ({ eventId, attendees, onScanSuccess, onClose }) => {
                     {/* Scan Results */}
                     {scanResult && (
                         <div className={`absolute inset-0 flex items-center justify-center bg-black/70
-                            ${scanResult.status === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+                            ${scanResult.status === 'success' ? 'text-green-400' : 
+                              scanResult.status === 'warning' ? 'text-yellow-400' : 'text-red-400'}`}>
                             <div className="text-center">
                                 {scanResult.status === 'success' ? (
                                     <>
                                         <CheckCircleIcon className="w-16 h-16 mx-auto mb-4" />
                                         <h3 className="text-xl font-bold">Check-in Successful!</h3>
+                                        <p className="mt-2">{scanResult.name}</p>
+                                    </>
+                                ) : scanResult.status === 'warning' ? (
+                                    <>
+                                        <XCircleIcon className="w-16 h-16 mx-auto mb-4 text-yellow-400" />
+                                        <h3 className="text-xl font-bold">{scanResult.message}</h3>
                                         <p className="mt-2">{scanResult.name}</p>
                                     </>
                                 ) : (
@@ -174,6 +212,14 @@ const QrScannerModal = ({ eventId, attendees, onScanSuccess, onClose }) => {
                             </div>
                         </div>
                     )}
+                </div>
+
+                {/* Debug info */}
+                <div className="mt-4 p-2 text-xs bg-gray-100 rounded-md overflow-auto max-h-24">
+                    <p>Event ID: {eventId}</p>
+                    <p>Attendees: {attendees.length}</p>
+                    <p>Scan Status: {scanStatus}</p>
+                    <p>Camera Ready: {cameraReady ? 'Yes' : 'No'}</p>
                 </div>
 
                 {/* Footer Instructions */}
