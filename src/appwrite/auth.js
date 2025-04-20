@@ -12,38 +12,72 @@ export class AuthService {
     this.account = new Account(this.client);
   }
 
+  // async createAccount({ email, password, name }) {
+  //   try {
+  //     const userAccount = await this.account.create(ID.unique(), email, password, name);
+  //     if (userAccount) {
+  //       return this.login({ email, password });
+  //     } else {
+  //       return userAccount;
+  //     }
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
+
+  // async SendOtp({ email }) {
+  //   try {
+  //     // Generate an email token (OTP) without creating a user
+  //     const token = await this.account.createEmailToken(ID.unique(), email);
+  //     return token; // Return the token for verification
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
+
+  // async verifyOtp(userId, otp) {
+  //   try {
+  //     // Verify the OTP by creating a session
+  //     const session = await this.account.createSession(userId, otp);
+  //     return session; // Return the session if verification is successful
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
+
+
+
+
+
+/////////////
+  // In AuthService.js
   async createAccount({ email, password, name }) {
     try {
-      const userAccount = await this.account.create(ID.unique(), email, password, name);
-      if (userAccount) {
-        return this.login({ email, password });
-      } else {
-        return userAccount;
-      }
+      return await this.account.create(ID.unique(), email, password, name);
     } catch (error) {
-      throw error;
+      throw new Error(error.message);
     }
   }
 
-  async SendOtp({ email }) {
+  async SendOtp(data) {
     try {
-      // Generate an email token (OTP) without creating a user
-      const token = await this.account.createEmailToken(ID.unique(), email);
-      return token; // Return the token for verification
+      return await this.account.createEmailToken(ID.unique(), data.email);
     } catch (error) {
-      throw error;
+      throw new Error(error.message);
     }
   }
 
   async verifyOtp(userId, otp) {
     try {
-      // Verify the OTP by creating a session
-      const session = await this.account.createSession(userId, otp);
-      return session; // Return the session if verification is successful
+      return await this.account.createSession(userId, otp);
     } catch (error) {
-      throw error;
+      throw new Error(error.message);
     }
   }
+
+
+
+/////////
 
   async login({ email, password }) {
     try {

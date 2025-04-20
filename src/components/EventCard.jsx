@@ -67,11 +67,11 @@ function EventCard({ $id, title, description, template, price, date, category, v
     const plainDescription = createPlainText(parsedDescription);
 
     return (
-        <Link to={`/events/${$id}`} className={`block group ${isFeatured ? 'col-span-full md:col-span-2' : ''}`}>
+        <Link to={`/events/${$id}`} className="block group">
             <div className="w-full bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 h-full border border-gray-100">
-                <div className={`flex ${isFeatured ? 'flex-col md:flex-row' : 'flex-col'} h-full`}>
+                <div className="flex flex-col h-full">
                     {/* Image Section */}
-                    <div className={`relative overflow-hidden ${isFeatured ? 'md:w-2/3 h-64 md:h-auto' : 'h-48'}`}>
+                    <div className="relative overflow-hidden h-48">
                         <img 
                             src={template ? appwriteService.getFilePreview(template) : '/placeholder-event.jpg'}
                             alt={title}
@@ -106,19 +106,17 @@ function EventCard({ $id, title, description, template, price, date, category, v
                     </div>
 
                     {/* Content Section */}
-                    <div className={`flex flex-col justify-between p-4 ${isFeatured ? 'md:w-1/3' : ''}`}>
+                    <div className="flex flex-col justify-between p-4">
                         <div>
                             {/* Title */}
                             <h3 className="text-lg font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
                                 {title}
                             </h3>
                             
-                            {/* Description (for featured cards or when available) */}
-                            {(isFeatured || description) && (
-                                <p className="text-gray-600 text-sm mb-3 line-clamp-3">
-                                    {plainDescription || 'Join us for this exciting event!'}
-                                </p>
-                            )}
+                            {/* Description (show for all cards) */}
+                            <p className="text-gray-600 text-sm mb-3 line-clamp-3">
+                                {plainDescription || 'Join us for this exciting event!'}
+                            </p>
                         </div>
                         
                         {/* Event Details */}

@@ -26,7 +26,7 @@ const EventXHowItWorks = () => {
       id: 4,
       icon: '📧',
       title: 'Receive Confirmation',
-      description: 'Get your e-ticket via email and in your account. You can download or print your ticket for the event.'
+      description: 'A confirmation email has been sent to you. You can also access your ticket anytime from your account to download or print it.'
     },
     {
       id: 5,

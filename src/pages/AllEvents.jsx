@@ -110,13 +110,13 @@ function AllEvents() {
 
     const renderEvents = useCallback((eventsArray) => (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {eventsArray.map((event, idx) => (
+            {eventsArray.map((event) => (
                 <EventCard 
                     key={event.$id} 
                     {...event} 
                     showStatus={user?.$id === event.userId}
                     attendees={event.attendees || Math.floor(Math.random() * 200) + 50}
-                    isFeatured={idx === 0 && eventsArray.length > 2}
+                    isFeatured={false} // Always set to false to ensure consistent size
                 />
             ))}
         </div>

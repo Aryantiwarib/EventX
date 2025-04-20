@@ -14,7 +14,8 @@ import {
     FaUser,
     FaShareAlt,
     FaSearch,
-    FaHeart
+    FaHeart,
+    FaGraduationCap // Added graduation cap icon for college year
 } from 'react-icons/fa'
 import { Button } from '../components'
 import parse from 'html-react-parser'
@@ -110,6 +111,17 @@ function EventDetails() {
     const toggleLike = () => {
         setLiked(!liked)
         // You could add API call here to save the like status
+    }
+
+    // Helper function to format college year display
+    const formatCollegeYear = (year) => {
+        if (!year) return "All Years";
+        
+        if (Array.isArray(year)) {
+            return year.join(', ');
+        }
+        
+        return year.toString();
     }
 
     if (loading) {
@@ -321,6 +333,17 @@ function EventDetails() {
                             <div className="mb-6">
                                 <p className="text-gray-500 mb-1">Price</p>
                                 <p className="text-3xl font-bold">₹{event.price?.toLocaleString()}</p>
+                            </div>
+                            
+                            {/* Added College Year Eligibility */}
+                            <div className="mb-6 p-3 bg-blue-50 rounded-lg">
+                                <div className="flex items-center mb-2">
+                                    <FaGraduationCap className="text-blue-600 mr-2" />
+                                    <h3 className="font-semibold">Eligible College Years</h3>
+                                </div>
+                                <p className="text-gray-700">
+                                    {formatCollegeYear(event.CollegeYear)}
+                                </p>
                             </div>
 
                             {userData ? (

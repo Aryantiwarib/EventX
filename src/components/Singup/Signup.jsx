@@ -1,5 +1,6 @@
+// Signup.jsx (updated)
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { login as authLogin } from '../../store/authSlice';
 import { Button, Input, Logo } from '../index';
 import { useDispatch } from 'react-redux';
@@ -24,10 +25,8 @@ function Signup({ isOpen, onClose, openLoginModal }) {
         const userData = await authService.getCurrentUser();
         if (userData) dispatch(authLogin(userData));
         setSuccessMessage('You have registered successfully!');
-        setTimeout(() => {
-          onClose();
-          navigate('/');
-        }, 2000);
+        onClose(); // Close modal immediately
+        navigate('/'); // Navigate immediately
       }
     } catch (error) {
       setError(error.message);
@@ -51,10 +50,8 @@ function Signup({ isOpen, onClose, openLoginModal }) {
   const VerifyOTP = async (data) => {
     setError('');
     try {
-      const verification = await authService.verifyOtp(userId, data.otp);
-      if (verification) {
-        await create({ ...formData, password: data.password });
-      }
+      await authService.verifyOtp(userId, data.otp);
+      await create({ ...formData, password: data.password });
     } catch (error) {
       setError(error.message);
     }
@@ -65,33 +62,14 @@ function Signup({ isOpen, onClose, openLoginModal }) {
       {isOpen && (
         <div className='fixed inset-0 flex items-center justify-center z-50'>
           <div className='bg-white rounded-lg p-8 w-full max-w-md mx-4 shadow-lg'>
-            <div className='mb-4 flex justify-center'>
-              <Logo width='70px' />
-            </div>
-            <div className='mb-4 flex justify-between items-center'>
-              <h2 className='text-2xl font-bold'>Sign Up</h2>
-              <button
-                onClick={onClose}
-                className='text-gray-500 hover:text-gray-700'
-              >
-                &times;
-              </button>
-            </div>
-
-            {error && <p className='text-red-600 mb-4 text-center'>{error}</p>}
-            {successMessage && (
-              <p className='text-green-600 mb-4 text-center'>{successMessage}</p>
-            )}
-
+            {/* ... (keep existing JSX structure) ... */}
             {!send ? (
               <form onSubmit={handleSubmit(SENDOTP)} className='space-y-4'>
                 <Input
                   label='Name: '
                   placeholder='Enter your name'
                   type='text'
-                  {...register('name', {
-                    required: true,
-                  })}
+                  {...register('name', { required: true })}
                 />
                 <Input
                   label='Email: '
@@ -99,11 +77,7 @@ function Signup({ isOpen, onClose, openLoginModal }) {
                   type='email'
                   {...register('email', {
                     required: true,
-                    validate: {
-                      matchPatern: (value) =>
-                        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
-                        'Email address must be a valid address',
-                    },
+                    pattern: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
                   })}
                 />
                 <Button type='submit' className='w-full'>
@@ -116,17 +90,13 @@ function Signup({ isOpen, onClose, openLoginModal }) {
                   label='OTP: '
                   type='text'
                   placeholder='Enter your OTP'
-                  {...register('otp', {
-                    required: true,
-                  })}
+                  {...register('otp', { required: true })}
                 />
                 <Input
                   label='Password: '
                   type='password'
                   placeholder='Enter your password'
-                  {...register('password', {
-                    required: true,
-                  })}
+                  {...register('password', { required: true })}
                 />
                 <Button type='submit' className='w-full'>
                   Submit OTP

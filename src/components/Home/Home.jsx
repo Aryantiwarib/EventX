@@ -134,7 +134,7 @@ const Home = () => {
 
   const handleCategoryChange = (category) => {
     // if(category === "technology") {
-      navigate(`/events/${category}`);
+      navigate(`/events/category/${category}`);
     // }
 
   }
