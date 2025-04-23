@@ -25,6 +25,11 @@ import PaymentHistory from './pages/PaymentHistory';
 import EventTickets from './components/Tickets/EventTickets';
 import EventTicket from './components/Tickets/EventTicket';
 import Tickets from './components/Tickets/Tickets';
+import Contact from './pages/Contact.jsx';
+import AboutUs from './pages/AboutUs.jsx';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
+import Refund from './pages/Refund';
 
 const router = createBrowserRouter([
   {
@@ -186,6 +191,51 @@ const router = createBrowserRouter([
       <AuthLayout authentication>
           {" "}
           <EventTicket />
+      </AuthLayout>
+  ),
+},
+{
+  path: "/contact",
+  element: (
+      <AuthLayout authentication>
+          {" "}
+          <Contact />
+      </AuthLayout>
+  ),
+},
+{
+  path: "/about-us",
+  element: (
+      <AuthLayout authentication>
+          {" "}
+          <AboutUs />
+      </AuthLayout>
+  ),
+},
+{
+  path: "/legal/terms",
+  element: (
+      <AuthLayout authentication>
+          {" "}
+          <Terms />
+      </AuthLayout>
+  ),
+},
+{
+  path: "/legal/privacy",
+  element: (
+      <AuthLayout authentication>
+          {" "}
+          <Privacy />
+      </AuthLayout>
+  ),
+},
+{
+  path: "/legal/refund",
+  element: (
+      <AuthLayout authentication>
+          {" "}
+          <Refund />
       </AuthLayout>
   ),
 },

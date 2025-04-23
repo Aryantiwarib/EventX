@@ -18,18 +18,10 @@ const DashboardStats = ({ userId }) => {
                     service.getEvents([Query.equal('userId', userId)])
                 ]);
 
-
-                const events = await Promise.all(
-                    bookings.documents.map(booking => 
-                      service.getEvent(booking.eventId) 
-                    )
-                  );
-
-                const attended = events.filter(event => {
-                    if (!event?.date) return false;
-                    return new Date(event.date) < new Date();
-                  }).length;
-
+                // Calculate attended events based on check-in status in bookings
+                const attended = bookings.documents.filter(
+                    booking => booking.status === 'checkedIn' // Use the correct status field
+                ).length;
 
                 setStats({
                     booked: bookings.total,

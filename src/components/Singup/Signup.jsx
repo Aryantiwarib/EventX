@@ -1,4 +1,3 @@
-// Signup.jsx (updated)
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login as authLogin } from '../../store/authSlice';
@@ -25,8 +24,8 @@ function Signup({ isOpen, onClose, openLoginModal }) {
         const userData = await authService.getCurrentUser();
         if (userData) dispatch(authLogin(userData));
         setSuccessMessage('You have registered successfully!');
-        onClose(); // Close modal immediately
-        navigate('/'); // Navigate immediately
+        onClose();
+        navigate('/');
       }
     } catch (error) {
       setError(error.message);
@@ -61,8 +60,23 @@ function Signup({ isOpen, onClose, openLoginModal }) {
     <>
       {isOpen && (
         <div className='fixed inset-0 flex items-center justify-center z-50'>
-          <div className='bg-white rounded-lg p-8 w-full max-w-md mx-4 shadow-lg'>
-            {/* ... (keep existing JSX structure) ... */}
+        <div className='bg-white rounded-lg p-8 w-full max-w-md mx-4 shadow-lg'>
+          <div className='mb-4 flex justify-center'>
+            <Logo width='70px' />
+          </div>
+          <div className='mb-4 flex justify-between items-center'>
+            <h2 className='text-2xl font-bold'>Create Account</h2>
+            <button
+              onClick={onClose}
+              className='text-gray-500 hover:text-gray-700'
+            >
+              &times;
+            </button>
+          </div>
+
+            {error && <p className='text-red-600 mb-4 text-center'>{error}</p>}
+            {successMessage && <p className='text-green-600 mb-4 text-center'>{successMessage}</p>}
+
             {!send ? (
               <form onSubmit={handleSubmit(SENDOTP)} className='space-y-4'>
                 <Input
