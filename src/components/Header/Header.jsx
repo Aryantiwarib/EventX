@@ -118,7 +118,7 @@ function Header() {
 
   const navItems = [
     { 
-      name: 'Events', 
+      name: 'Events-AT', 
       slug: '/events',
       active: true,
       onClick: () => {
