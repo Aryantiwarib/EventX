@@ -172,21 +172,21 @@ const Home = () => {
           {/* Category Pills */}
           <div className="flex flex-wrap justify-center gap-2 mb-12">
             <button
-            onClick={() => handleCategoryChange("technology")}
+            onClick={() => handleCategoryChange("Technology")}
              className="px-4 py-1 bg-gray-900 text-white rounded-full hover:bg-black transition-colors">Technology</button>
             <button
-            onClick={() => handleCategoryChange("cultural")} className="px-4 py-1 bg-white border rounded-full hover:bg-gray-100 transition-colors">Cultural</button>
+            onClick={() => handleCategoryChange("Cultural")} className="px-4 py-1 bg-white border rounded-full hover:bg-gray-100 transition-colors">Cultural</button>
             <button
-            onClick={() => handleCategoryChange("career")}
+            onClick={() => handleCategoryChange("Career")}
              className="px-4 py-1 bg-white border rounded-full hover:bg-gray-100 transition-colors">Career</button>
             <button
-            onClick={() => handleCategoryChange("sports")}
+            onClick={() => handleCategoryChange("Sports")}
              className="px-4 py-1 bg-white border rounded-full hover:bg-gray-100 transition-colors">Sports</button>
             <button
-            onClick={() => handleCategoryChange("academic")}
+            onClick={() => handleCategoryChange("Academic")}
              className="px-4 py-1 bg-white border rounded-full hover:bg-gray-100 transition-colors">Academic</button>
             <button
-            onClick={() => handleCategoryChange("workshop")}
+            onClick={() => handleCategoryChange("Wrkshop")}
              className="px-4 py-1 bg-white border rounded-full hover:bg-gray-100 transition-colors">Workshop</button>
           </div>
         </section>

@@ -32,11 +32,11 @@ const BookingsList = ({ userId }) => {
                             </p>
                         </div>
                         <span className={`text-sm ${
-                            new Date(booking.event.date) < new Date() 
+                            booking.status === 'checkedIn' 
                             ? 'text-green-600' 
                             : 'text-red-600'
                         }`}>
-                            {new Date(booking.event.date) < new Date() ? 'Attended' : 'Booked'}
+                            {booking.status === 'checkedIn' ? 'Attended' : 'Booked'}
                         </span>
                     </div>
                     <Link 
