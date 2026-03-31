@@ -450,7 +450,7 @@ function BookEvent() {
 
     const initiatePayment = () => {
         const options = {
-            key: "rzp_test_fXVCC0ILCOrj7Y",
+            key: "rzp_test_SXONAICSSMElAV",
             amount: (event.price * 100).toString(), // Convert to paise
             currency: "INR",
             name: event.title,
