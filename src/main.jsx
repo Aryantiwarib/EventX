@@ -12,7 +12,7 @@ import Login from "./pages/Login.jsx"
 // import PaymentComponents from "./Features/PaymentComponents.tsx"
 // import Scanner from "./Features/Scanner.jsx"
 import AllEvents from "./pages/AllEvents.jsx"
-import { AddEvent } from './components/index.js';
+import AddEvent from './pages/AddEvent.jsx';
 import EventDetails from './pages/EventDetails.jsx';
 import EditEvent from "./pages/EditEvent.jsx"
 import BookEvent from './BookingAndPayment/BookEvent.jsx';
@@ -63,7 +63,7 @@ const router = createBrowserRouter([
       {
         path:"/add-event",
         element:(
-          <AuthLayout authentication>
+          <AuthLayout authentication adminOnly>
             {""}
             <AddEvent/>
           </AuthLayout>
@@ -101,7 +101,7 @@ const router = createBrowserRouter([
       {
         path: "/edit-event/:eventId",
         element: (
-            <AuthLayout authentication>
+            <AuthLayout authentication adminOnly>
                 {" "}
                 <EditEvent />
             </AuthLayout>
@@ -128,7 +128,7 @@ const router = createBrowserRouter([
   {
     path: "/event-attendees/:eventId",
     element: (
-        <AuthLayout authentication>
+        <AuthLayout authentication adminOnly>
             {" "}
             <EventAttendees />
         </AuthLayout>

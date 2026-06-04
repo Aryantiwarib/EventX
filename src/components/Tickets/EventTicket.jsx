@@ -4,6 +4,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useParams, useNavigate } from 'react-router-dom';
 import appwriteService from '../../appwrite/config';
 import { useSelector } from 'react-redux';
+import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaInfoCircle, FaDownload } from 'react-icons/fa';
 
 const EventTicket = () => {
   const { eventId, ticketId } = useParams();
@@ -132,84 +133,129 @@ const EventTicket = () => {
     : 'TBD';
 
   return (
-    <div className="w-full max-w-md mx-auto bg-white rounded-lg overflow-hidden shadow-md border border-gray-200">
-      {/* Blue header with logo */}
-      <div className="bg-blue-500 p-4 text-center relative">
-        <div className="inline-block bg-white rounded-full p-2 absolute right-4 top-4">
-          <span className="text-blue-500 font-bold text-xl">X</span>
-        </div>
-        <div className="text-white text-2xl font-bold">Event<span className="font-normal">X</span></div>
-      </div>
-
-      {/* Event details */}
-      <div className="p-6 text-center border-b border-gray-200">
-        <h2 className="text-2xl font-bold text-gray-800">{event.title || 'Event Title'}</h2>
-        <p className="text-gray-600">{event.organizer || 'Organizer'}</p>
+    <div className="w-full max-w-md mx-auto bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-150 printable-ticket-card font-sans transition-all duration-300 hover:shadow-2xl">
+      {/* Brand Header with confirmation */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white relative">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
         
-        <div className="flex justify-center items-center gap-2 mt-4">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          <span className="text-gray-700">{formattedDate}</span>
-          
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span className="text-gray-700">{event.time || 'TBD'}</span>
+        <div className="flex justify-between items-center relative z-10 mb-6">
+          <div className="text-xl font-extrabold tracking-tight">
+            Event<span className="text-blue-200">X</span>
+          </div>
+          <span className="bg-green-500/20 text-green-300 text-xs font-bold px-3 py-1 rounded-full border border-green-500/30 shadow-inner flex items-center gap-1.5 backdrop-blur-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+            Confirmed
+          </span>
         </div>
-        
-        <div className="flex justify-center items-center gap-2 mt-2">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          <span className="text-gray-700">{event.location || 'Main Hall'}</span>
+
+        <div className="relative z-10">
+          <span className="text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2.5 py-1 rounded-md text-blue-100 backdrop-blur-sm">
+            {event.category || 'General'}
+          </span>
+          <h2 className="text-2xl font-extrabold tracking-tight mt-3 text-white leading-tight">
+            {event.title || 'Event Title'}
+          </h2>
+          <p className="text-blue-100 text-xs mt-1.5 font-medium">
+            Organized by {event.organizer || 'EventX'}
+          </p>
         </div>
       </div>
 
-      {/* Ticket details */}
-      <div className="grid grid-cols-2 gap-4 p-4 border-b border-gray-200">
-        <div>
-          <p className="text-gray-500 text-sm">Attendee</p>
-          <p className="font-medium text-gray-800">{ticket.ticketHolderName}</p>
-        </div>
-        <div>
-          <p className="text-gray-500 text-sm">Ticket Type</p>
-          <p className="font-medium text-gray-800">{ticket.ticketType || 'Standard'}</p>
-        </div>
-        <div>
-          <p className="text-gray-500 text-sm">Ticket ID</p>
-          <p className="font-medium text-gray-800">TX-{ticket.$id?.substring(0, 6)}</p>
-        </div>
-        <div>
-          <p className="text-gray-500 text-sm">Status</p>
-          <p className="font-medium text-gray-800">Confirmed</p>
+      {/* Date, Time, Venue Pills */}
+      <div className="p-6 border-b border-gray-150 bg-white">
+        <div className="grid grid-cols-3 gap-3 bg-gray-50 border border-gray-150 rounded-xl p-3 text-center">
+          <div className="flex flex-col items-center">
+            <FaCalendarAlt className="text-blue-600 text-sm mb-1" />
+            <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Date</span>
+            <span className="text-xs font-bold text-gray-800 mt-0.5">{formattedDate}</span>
+          </div>
+          <div className="flex flex-col items-center border-x border-gray-200">
+            <FaClock className="text-blue-600 text-sm mb-1" />
+            <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Time</span>
+            <span className="text-xs font-bold text-gray-800 mt-0.5">{event.time || 'TBD'}</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <FaMapMarkerAlt className="text-blue-600 text-sm mb-1" />
+            <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Venue</span>
+            <span className="text-xs font-bold text-gray-800 mt-0.5 line-clamp-1 w-full px-1" title={event.location || 'Main Hall'}>
+              {event.location || 'Main Hall'}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* QR Code */}
-      <div className="p-6 flex flex-col items-center">
-        <QRCodeSVG
-          value={JSON.stringify({
-            eventId: event.$id,
-            bookingId: ticket.$id,
-            name: ticket.ticketHolderName
-          })}
-          size={200}
-          includeMargin={true}
-        />
-        <p className="text-gray-500 text-sm mt-4">Please show this QR code at the venue entrance</p>
+      {/* Ticket Details Grid */}
+      <div className="bg-white grid grid-cols-2 gap-x-6 gap-y-4 p-6 border-b border-gray-150">
+        <div>
+          <p className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-0.5">Attendee</p>
+          <p className="font-bold text-gray-800 text-sm line-clamp-1">{ticket.ticketHolderName}</p>
+          <p className="text-gray-400 text-[11px] line-clamp-1 mt-0.5">{ticket.ticketHolderEmail}</p>
+        </div>
+        <div>
+          <p className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-0.5">Ticket Type</p>
+          <span className="inline-flex items-center text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-full border border-indigo-100">
+            {ticket.ticketType || 'Standard'}
+          </span>
+        </div>
+        <div>
+          <p className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-0.5">Ticket ID</p>
+          <p className="font-mono font-bold text-gray-800 text-sm">TX-{ticket.$id?.substring(0, 8).toUpperCase()}</p>
+        </div>
+        <div>
+          <p className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-0.5">Booking Status</p>
+          <span className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full ${
+            ticket.status === 'checkedIn' ? 'bg-green-100 text-green-800 border border-green-200' :
+            'bg-blue-100 text-blue-800 border border-blue-200'
+          }`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${ticket.status === 'checkedIn' ? 'bg-green-500' : 'bg-blue-500'}`} />
+            {ticket.status === 'checkedIn' ? 'Checked In' : 'Confirmed'}
+          </span>
+        </div>
+        <div>
+          <p className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-0.5">Price Paid</p>
+          <p className="font-bold text-gray-800 text-sm">
+            {ticket.amount && parseFloat(ticket.amount) > 0 ? `₹${parseFloat(ticket.amount).toLocaleString()}` : 'Free'}
+          </p>
+        </div>
+        <div>
+          <p className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-0.5">Payment ID</p>
+          <p className="font-mono text-gray-600 text-[11px] line-clamp-1">{ticket.paymentId || 'N/A'}</p>
+        </div>
+      </div>
+
+      {/* Left & Right Circle Cutouts + Dashed Divider */}
+      <div className="relative flex items-center justify-between bg-white py-1">
+        <div className="absolute left-0 w-6 h-6 bg-gray-50 print:bg-white border-r border-gray-200 rounded-r-full -translate-x-3 z-10" />
+        <div className="w-full border-t-2 border-dashed border-gray-200 print:border-gray-300" />
+        <div className="absolute right-0 w-6 h-6 bg-gray-50 print:bg-white border-l border-gray-200 rounded-l-full translate-x-3 z-10" />
+      </div>
+
+      {/* QR Code Stub */}
+      <div className="p-6 bg-white flex flex-col items-center">
+        <div className="p-3 bg-white border border-gray-150 rounded-2xl shadow-inner mb-3">
+          <QRCodeSVG
+            value={JSON.stringify({
+              eventId: event.$id,
+              bookingId: ticket.$id,
+              name: ticket.ticketHolderName
+            })}
+            size={180}
+            includeMargin={true}
+          />
+        </div>
+        <p className="text-gray-400 text-[10px] flex items-center gap-1.5 font-semibold text-center uppercase tracking-wide">
+          <FaInfoCircle className="text-blue-500 shrink-0" />
+          Present this QR code for scanning at the venue entry.
+        </p>
       </div>
 
       {/* Download Button */}
-      <div className="p-4 border-t border-gray-200 flex justify-center">
+      <div className="p-4 bg-gray-50 border-t border-gray-200 flex justify-center print:hidden">
         <button
           onClick={() => window.print()}
-          className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-md flex items-center gap-2 transition-colors"
+          className="w-full max-w-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg cursor-pointer text-sm"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-          </svg>
+          <FaDownload />
           Download Ticket
         </button>
       </div>

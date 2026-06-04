@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Container, Logo, LogoutBtn, Signup, Login } from '../index';
+import { toast } from 'sonner';
 import ProfileCard from '../ProfileCard';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -16,6 +17,19 @@ function Header() {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isProfileCardOpen, setIsProfileCardOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [animateBell, setAnimateBell] = useState(false);
+
+  const checkIsAdmin = (user) => {
+    if (!user) return false;
+    return (
+      user.labels?.includes('admin') ||
+      user.prefs?.role === 'admin' ||
+      user.prefs?.isAdmin === true ||
+      user.email?.endsWith('@eventx-admin.com')
+    );
+  };
+  
+  const isAdmin = authStatus && checkIsAdmin(userData);
   
   const profileRef = useRef(null);
 
@@ -40,24 +54,16 @@ function Header() {
       if (!authStatus || !userData.$id) return;
       
       try {
-        const response = await service.getUserNotifications(userData.$id);
+        const response = await service.getUserNotifications(
+          userData.$id, 
+          userData.$createdAt || userData.registration
+        );
         if (isMounted) {
           const unreadNotifications = response.documents.filter(n => n.isRead === false);
           setUnreadCount(unreadNotifications.length);
         }
-      } catch (error) {
+      } catch {
         setUnreadCount(0);
-      }
-    };
-
-    const markAllNotificationsRead = async () => {
-      if (!authStatus || !userData.$id) return;
-      
-      try {
-        await service.markAllNotificationsRead(userData.$id);
-        setUnreadCount(0);
-      } catch (error) {
-        console.error("Error marking notifications as read:", error);
       }
     };
 
@@ -75,9 +81,37 @@ function Header() {
         subscription = client.subscribe(
           `databases.${conf.appwriteDatabaseId}.collections.${conf.appwriteCollectionNotificationsId}.documents`,
           async response => {
-            if (response.events.includes('databases.*.collections.*.documents.*.create') ||
-                response.events.includes('databases.*.collections.*.documents.*.update') ||
-                response.events.includes('databases.*.collections.*.documents.*.delete')) {
+            if (response.events.includes('databases.*.collections.*.documents.*.create')) {
+              const newNotif = response.payload;
+              if (newNotif.userId === userData.$id) {
+                const cleanDescription = newNotif.description 
+                  ? newNotif.description.replace(/<[^>]*>/g, '') 
+                  : '';
+                
+                toast.info(newNotif.title || 'New Notification', {
+                  description: cleanDescription,
+                  duration: 6000,
+                  action: newNotif.actionUrl ? {
+                    label: 'View',
+                    onClick: () => {
+                      if (newNotif.actionUrl.startsWith('http')) {
+                        window.location.href = newNotif.actionUrl;
+                      } else {
+                        navigate(newNotif.actionUrl);
+                      }
+                      service.markNotificationAsRead(newNotif.$id).catch(console.error);
+                    }
+                  } : undefined
+                });
+
+                if (isMounted) {
+                  setAnimateBell(true);
+                  setTimeout(() => setAnimateBell(false), 1200);
+                  await fetchNotificationCount();
+                }
+              }
+            } else if (response.events.includes('databases.*.collections.*.documents.*.update') ||
+                       response.events.includes('databases.*.collections.*.documents.*.delete')) {
               if (isMounted) {
                 await fetchNotificationCount();
               }
@@ -89,6 +123,8 @@ function Header() {
       }
     };
 
+
+
     fetchNotificationCount();
     setupRealtime();
 
@@ -99,18 +135,6 @@ function Header() {
       }
     };
   }, [authStatus, userData.$id]);
-
-  const refreshNotificationCount = async () => {
-    if (!authStatus || !userData.$id) return;
-    
-    try {
-      const response = await service.getUserNotifications(userData.$id);
-      const unreadNotifications = response.documents.filter(n => n.isRead === false);
-      setUnreadCount(unreadNotifications.length);
-    } catch (error) {
-      console.error("Error refreshing notifications:", error);
-    }
-  };
 
   const handleNotificationClick = async () => {
     navigate('/notifications?filter=unread');
@@ -148,21 +172,22 @@ function Header() {
       }
     },  
     { name: 'How It Work', slug: '/work-flow', active: authStatus },
-    { name: 'Add Event', slug: '/add-event', active: authStatus },
+    { name: 'Add Event', slug: '/add-event', active: authStatus && isAdmin },
   ];
 
   const profileOptions = [
     { 
       name: 'Profile', 
       slug: '#',
+      active: true,
       onClick: () => {
         setIsProfileCardOpen(true);
         setIsProfileDropdownOpen(false);
       }
     },
-    { name: 'Payment History', slug: `/payment-history`},
-    { name: 'Dashboard', slug: '/dashboard' },
-    { name: 'EventTickets', slug: '/tickets' },
+    { name: 'Payment History', slug: `/payment-history`, active: !isAdmin },
+    { name: 'Dashboard', slug: '/dashboard', active: true },
+    { name: 'EventTickets', slug: '/tickets', active: !isAdmin },
   ];
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -224,18 +249,19 @@ function Header() {
               <div className='flex items-center ml-4 space-x-3'>
                 <button 
                   onClick={handleNotificationClick}
-                  className='p-2 text-gray-500 hover:text-blue-500 transition-colors relative cursor-pointer'
+                  className='p-2 text-gray-500 hover:text-blue-600 transition-all duration-200 relative cursor-pointer hover:scale-105 active:scale-95'
                 >
-                  <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <svg className={`w-5 h-5 transition-transform duration-300 ${animateBell ? 'animate-bounce text-blue-600' : ''}`} fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                     <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' 
                       d='M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1'/>
                   </svg>
                   {unreadCount > 0 && (
-                    <div className='absolute top-0 right-0 transform translate-x-1 -translate-y-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center'>
-                      {unreadCount > 9 ? '9+' : unreadCount}
-                    </div>
+                    <span className='absolute top-1 right-1 bg-red-500 text-white text-[9px] font-extrabold rounded-full min-w-4 h-4 px-1 flex items-center justify-center ring-2 ring-white transform translate-x-0.5 -translate-y-0.5 animate-in zoom-in duration-200'>
+                      {unreadCount}
+                    </span>
                   )}
                 </button>
+
 
                 <div className='relative cursor-pointer' ref={profileRef}>
                   <button 
@@ -264,7 +290,7 @@ function Header() {
                       </div>
                       
                       <div className='py-2'>
-                        {profileOptions.map((option) => (
+                        {profileOptions.filter(o => o.active !== false).map((option) => (
                           <button
                             key={option.name}
                             onClick={() => {
@@ -371,7 +397,7 @@ function Header() {
                         )}
                       </button>
                     </li>
-                    {profileOptions.map((option) => (
+                    {profileOptions.filter(o => o.active !== false).map((option) => (
                       <li key={option.name}>
                         <button
                           onClick={() => {

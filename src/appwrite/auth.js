@@ -80,11 +80,7 @@ export class AuthService {
 /////////
 
   async login({ email, password }) {
-    try {
-      return await this.account.createEmailPasswordSession(email, password);
-    } catch (error) {
-      throw error;
-    }
+    return await this.account.createEmailPasswordSession(email, password);
   }
 
   async getCurrentUser() {
@@ -102,6 +98,22 @@ export class AuthService {
     } catch (error) {
       console.log('Appwrite service :: logout :: error', error);
       throw error;
+    }
+  }
+
+  async updateName(name) {
+    try {
+      return await this.account.updateName(name);
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }
+
+  async updatePassword(password) {
+    try {
+      return await this.account.updatePassword(password);
+    } catch (error) {
+      throw new Error(error.message);
     }
   }
 }

@@ -8,7 +8,16 @@ const Home = () => {
   const [featuredEvent, setFeaturedEvent] = useState(null);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      navigate(`/events?search=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate('/events');
+    }
+  };
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -105,7 +114,7 @@ const Home = () => {
         // For other formats
         return 'Join us for this exciting event!';
       }
-    } catch (error) {
+    } catch {
       // If it's not JSON, assume it's plain text or HTML
       return description.substring(0, 150) + '...';
     }
@@ -159,12 +168,22 @@ const Home = () => {
             <input
               type="text"
               placeholder="Search for events, workshops, concerts..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleSearch();
+                }
+              }}
               className="w-full p-3 pl-10 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <div className="absolute left-3 top-3 text-gray-400">
               <Search size={20} />
             </div>
-            <button className="absolute right-0 bg-blue-500 text-white px-6 py-3 rounded-full hover:bg-blue-600 transition-colors">
+            <button 
+              onClick={handleSearch}
+              className="absolute right-0 bg-blue-500 text-white px-6 py-3 rounded-full hover:bg-blue-600 transition-colors cursor-pointer"
+            >
               Search
             </button>
           </div>

@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
-import authService from "./appwrite/auth"
-import {login, logout} from "./store/authSlice"
-import { Fotter, Header } from './components/index'
 import { Outlet } from 'react-router-dom'
+import authService from './appwrite/auth'
+import { login, logout } from './store/authSlice'
+import { Header, Fotter } from './components'
+import { Toaster } from 'sonner'
 
 function App() {
   const [loading, setLoading] = useState(true)
@@ -19,16 +20,21 @@ function App() {
       }
     })
     .finally(() => setLoading(false))
-  }, [])
+  }, [dispatch])
   
   return !loading ? (
     <div className='min-h-screen flex flex-wrap content-between bg-white'>
+      <Toaster richColors position="top-right" closeButton />
       <div className='w-full block'>
-        <Header />
+        <div className="print:hidden">
+          <Header />
+        </div>
         <main>
         <Outlet />
         </main>
-        <Fotter />
+        <div className="print:hidden">
+          <Fotter />
+        </div>
       </div>
     </div>
   ) : null

@@ -3,7 +3,6 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import appwriteService from '../../appwrite/config';
 import { Button } from '../index';
-import { format } from 'date-fns';
 import { QRCodeSVG } from 'qrcode.react';
 
 function EventTickets() {

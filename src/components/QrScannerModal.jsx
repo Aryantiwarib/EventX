@@ -38,6 +38,7 @@ const QrScannerModal = ({ eventId, attendees, onScanSuccess, onClose }) => {
     if (scannerRef.current && scannerContainerRef.current) {
       startScanner();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scannerRef.current, scannerContainerRef.current]);
   
   const startScanner = async () => {
@@ -80,7 +81,7 @@ const QrScannerModal = ({ eventId, attendees, onScanSuccess, onClose }) => {
       let scannedData;
       try {
         scannedData = JSON.parse(decodedText);
-      } catch (e) {
+      } catch {
         // If not JSON, check if the text itself might be a booking ID
         if (typeof decodedText === 'string' && decodedText.length > 0) {
           const possibleAttendee = attendees.find(a => a.$id === decodedText);
@@ -160,7 +161,7 @@ const QrScannerModal = ({ eventId, attendees, onScanSuccess, onClose }) => {
     }
   };
   
-  const handleQrCodeError = (error) => {
+  const handleQrCodeError = () => {
     // Don't show errors from normal scanning process
     // console.error("QR Scanner error:", error);
   };

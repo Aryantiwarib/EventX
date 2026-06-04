@@ -54,7 +54,7 @@ const Scanner = () => {
           setTimeout(() => setSuccess(""), 3000); // Clear success message after 3 seconds
           setError(""); // Clear previous errors
         }
-      } catch (err) {
+      } catch {
         // Handle plain text QR codes (comma-separated values)
         const [name, email] = result.text.split(",");
         if (name && email) {

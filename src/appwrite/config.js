@@ -1,10 +1,12 @@
 import conf from '../conf/conf.js';
-import { Client, ID, Databases, Storage, Query } from "appwrite";
+import { Client, ID, Databases, Storage, Query, Account } from "appwrite";
 
 export class Service {
     client = new Client();
     databases;
     bucket;
+    account;
+    syncPromise = null;
 
     constructor() {
         this.client
@@ -13,6 +15,7 @@ export class Service {
 
         this.databases = new Databases(this.client);
         this.bucket = new Storage(this.client);
+        this.account = new Account(this.client);
     }
 
     async createEvent({ title, slug, price, CollegeYear, category, date, venue, template, description, status, userId }) {
@@ -386,9 +389,23 @@ export class Service {
         }
     }
 
-    async getUserNotifications(userId) {
+    async getUserNotifications(userId, userCreatedAt = null) {
+        // If a sync is already running, wait for it to complete first
+        if (this.syncPromise) {
+            try {
+                await this.syncPromise;
+            } catch (e) {
+                console.error("Previous sync failed:", e);
+            }
+        }
+
+        let resolveSync;
+        this.syncPromise = new Promise(resolve => {
+            resolveSync = resolve;
+        });
+
         try {
-            // First get user-specific notifications
+            // Get user-specific notifications
             const userNotifications = await this.databases.listDocuments(
                 conf.appwriteDatabaseId,
                 conf.appwriteCollectionNotificationsId,
@@ -399,18 +416,34 @@ export class Service {
                 ]
             );
 
-            // Get template notifications
+            // Fetch user preferences for sync date
+            let lastSyncDate = null;
+            let prefs = {};
+            try {
+                prefs = await this.account.getPrefs();
+                lastSyncDate = prefs.lastNotificationSyncDate;
+            } catch (err) {
+                console.error("Failed to fetch user preferences:", err);
+            }
+
+            // Fallback to user creation date or old date
+            if (!lastSyncDate) {
+                lastSyncDate = userCreatedAt || '1970-01-01T00:00:00Z';
+            }
+
+            // Get template notifications created AFTER lastSyncDate
             const templateNotifications = await this.databases.listDocuments(
                 conf.appwriteDatabaseId,
                 conf.appwriteCollectionNotificationsTemplatesId,
                 [
                     Query.equal('isTemplate', true),
+                    Query.greaterThan('$createdAt', lastSyncDate),
                     Query.orderDesc('$createdAt'),
                     Query.limit(20)
                 ]
             );
 
-            // Check which templates haven't been converted to user notifications
+            // Filter out templates that already exist in the user's notifications (just in case)
             const existingEventIds = new Set(userNotifications.documents.map(doc => doc.eventId));
             const newTemplates = templateNotifications.documents.filter(template =>
                 !existingEventIds.has(template.eventId)
@@ -428,6 +461,27 @@ export class Service {
                     })
                 );
                 await Promise.all(copyPromises);
+
+                // Update preferences with latest template creation date
+                const latestTemplateDate = templateNotifications.documents[0].$createdAt;
+                try {
+                    await this.account.updatePrefs({
+                        ...prefs,
+                        lastNotificationSyncDate: latestTemplateDate
+                    });
+                } catch (err) {
+                    console.error("Failed to update user preferences:", err);
+                }
+            } else if (!prefs.lastNotificationSyncDate && userCreatedAt) {
+                // Persist the initialized lastSyncDate if it wasn't set previously
+                try {
+                    await this.account.updatePrefs({
+                        ...prefs,
+                        lastNotificationSyncDate: lastSyncDate
+                    });
+                } catch (err) {
+                    console.error("Failed to update user preferences:", err);
+                }
             }
 
             // Return final combined list
@@ -443,6 +497,9 @@ export class Service {
         } catch (error) {
             console.error(`Appwrite :: getUserNotifications :: ${error}`);
             throw error;
+        } finally {
+            resolveSync();
+            this.syncPromise = null;
         }
     }
 
@@ -501,6 +558,22 @@ export class Service {
             throw error;
         }
     }
+
+    async deleteAllNotifications(userId) {
+        try {
+            const { documents } = await this.getUserNotifications(userId);
+            const promises = documents.map(n =>
+                this.deleteNotification(n.$id)
+            );
+
+            await Promise.all(promises);
+            return true;
+        } catch (error) {
+            console.error(`Appwrite :: deleteAllNotifications :: ${error}`);
+            throw error;
+        }
+    }
+
 
 
 

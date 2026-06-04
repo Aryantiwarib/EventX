@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Container } from '../components';
 import EventCard from '../components/EventCard';
 import Loader from '../components/Loader';
@@ -15,8 +15,12 @@ const LOADER_DELAY = 300; // Show loader after 300ms
 function AllEvents() {
     const navigate = useNavigate();
     const { category: urlCategory } = useParams();
+    const location = useLocation();
     const [rawEvents, setRawEvents] = useState([]);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery, setSearchQuery] = useState(() => {
+        const searchParams = new URLSearchParams(location.search);
+        return searchParams.get('search') || '';
+    });
     const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
     const [showLoader, setShowLoader] = useState(false);
     const [categories] = useState([
@@ -87,6 +91,22 @@ function AllEvents() {
         return () => clearTimeout(timeoutRef.current);
     }, [fetchEvents]);
 
+    useEffect(() => {
+        const searchParams = new URLSearchParams(location.search);
+        const q = searchParams.get('search') || '';
+        setSearchQuery(q);
+    }, [location.search]);
+
+    const handleSearchSubmit = useCallback((e) => {
+        e?.preventDefault();
+        const trimmed = searchQuery.trim();
+        if (trimmed) {
+            navigate(urlCategory ? `/events/category/${urlCategory}?search=${encodeURIComponent(trimmed)}` : `/events?search=${encodeURIComponent(trimmed)}`);
+        } else {
+            navigate(urlCategory ? `/events/category/${urlCategory}` : '/events');
+        }
+    }, [searchQuery, urlCategory, navigate]);
+
     const handleCategoryChange = useCallback((category) => {
         if (category === selectedCategory) return;
         setIsMobileFilterOpen(false);
@@ -135,7 +155,7 @@ function AllEvents() {
                         </p>
                     </div>
                     
-                    <div className="relative mt-4 md:mt-0 w-full md:w-auto flex">
+                    <form onSubmit={handleSearchSubmit} className="relative mt-4 md:mt-0 w-full md:w-auto flex">
                         <div className="relative flex-1 md:w-64">
                             <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                             <input
@@ -146,17 +166,18 @@ function AllEvents() {
                                 className="w-full pl-10 pr-4 py-2 rounded-l-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
                             />
                         </div>
-                        <button className="bg-blue-600 text-white px-4 py-2 rounded-r-lg font-medium hover:bg-blue-700 transition-colors">
+                        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-r-lg font-medium hover:bg-blue-700 transition-colors">
                             Search
                         </button>
                         
                         <button 
+                            type="button"
                             className="ml-2 md:hidden bg-white p-2 rounded-lg border border-gray-200"
                             onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
                         >
                             <FaFilter className="text-gray-600" />
                         </button>
-                    </div>
+                    </form>
                 </div>
 
                 <div className="flex flex-col md:flex-row gap-6">

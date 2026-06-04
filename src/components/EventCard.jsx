@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { FaCalendarAlt, FaMapMarkerAlt, FaUsers } from 'react-icons/fa';
 import DOMPurify from 'dompurify'; // Make sure to install this for sanitization
 
-function EventCard({ $id, title, description, template, price, date, category, venue, status, showStatus, attendees, isFeatured }) {
+function EventCard({ $id, title, description, template, price, date, category, venue, status, showStatus, attendees }) {
     const eventDate = new Date(date).toLocaleDateString('en-US', {
         day: 'numeric',
         month: 'short',
@@ -42,7 +42,7 @@ function EventCard({ $id, title, description, template, price, date, category, v
                 // For other formats
                 return 'Join us for this exciting event!';
             }
-        } catch (error) {
+        } catch {
             // If it's not JSON, assume it's plain text or HTML
             return rteContent.substring(0, 150) + '...';
         }

@@ -32,8 +32,11 @@ export default function EventForm({ event }) {
 
     const navigate = useNavigate();
     const userData = useSelector((state) => state.auth.userData);
+    const [loading, setLoading] = React.useState(false);
 
     const submit = async (data) => {
+        if (loading) return;
+        setLoading(true);
         try {
             let templateId = event?.template || null;
             const isNewEvent = !event;
@@ -66,8 +69,11 @@ export default function EventForm({ event }) {
         } catch (error) {
             console.error("Event submission failed:", error);
             alert(error.message);
+        } finally {
+            setLoading(false);
         }
     };
+
 
     const slugTransform = useCallback((value) => {
         return value
@@ -307,10 +313,16 @@ export default function EventForm({ event }) {
                         {/* Submit Button */}
                         <Button
                             type="submit"
-                            className="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl hover:from-blue-700 hover:to-purple-700 transform hover:scale-[1.02] transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={Object.keys(errors).length > 0}
+                            className="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl hover:from-blue-700 hover:to-purple-700 transform hover:scale-[1.02] transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            disabled={loading || Object.keys(errors).length > 0}
                         >
-                            {event ? "Update Event" : "Create Event →"}
+                            {loading ? (
+                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            ) : event ? (
+                                "Update Event"
+                            ) : (
+                                "Create Event →"
+                            )}
                         </Button>
                     </div>
                 </div>

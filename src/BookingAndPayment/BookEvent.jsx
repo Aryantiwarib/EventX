@@ -315,8 +315,11 @@ import { useSelector } from 'react-redux';
 import appwriteService from '../appwrite/config';
 import { Button } from '../components';
 import { FaEnvelope, FaUser, FaLock } from 'react-icons/fa';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import emailjs from '@emailjs/browser';
+import { toast } from 'sonner';
+
 
 function BookEvent() {
     const { eventId } = useParams();
@@ -330,6 +333,8 @@ function BookEvent() {
     const [email, setEmail] = useState(currentUser?.email || '');
     const [formError, setFormError] = useState('');
     const [hasBooking, setHasBooking] = useState(false);
+    const [paymentLoading, setPaymentLoading] = useState(false);
+
 
     useEffect(() => {
         const fetchEvent = async () => {
@@ -449,8 +454,9 @@ function BookEvent() {
     };
 
     const initiatePayment = () => {
+        setPaymentLoading(true);
         const options = {
-            key: "rzp_test_SXONAICSSMElAV",
+            key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_SXONAICSSMElAV",
             amount: (event.price * 100).toString(), // Convert to paise
             currency: "INR",
             name: event.title,
@@ -497,6 +503,16 @@ function BookEvent() {
                     });
                     console.log('Payment record created');
                     
+                    // Create real-time user notification
+                    await appwriteService.createUserNotification(currentUser.$id, {
+                        title: "Booking Confirmed!",
+                        description: `You have successfully booked a ticket for "${event.title}".`,
+                        eventType: event.category,
+                        actionUrl: `/events/${event.$id}/tickets/${booking.$id}`,
+                        eventId: event.$id
+                    });
+                    console.log('Notification created');
+
                     // Try to send confirmation email
                     try {
                         const emailSent = await sendConfirmationEmail(bookingData, response.razorpay_payment_id);
@@ -509,6 +525,8 @@ function BookEvent() {
                         console.error('Email error occurred but continuing with booking process:', emailError);
                     }
 
+                    toast.success("Payment completed & Booking confirmed!");
+
                     // Navigate to the ticket view page - do this regardless of email success/failure
                     navigate(`/events/${eventId}/tickets/${booking.$id}`, {
                         state: {
@@ -519,13 +537,21 @@ function BookEvent() {
                     });
                 } catch (error) {
                     console.error('Payment processing failed:', error);
-                    alert(`Payment completed but record creation failed. Please contact support with this ID: ${response.razorpay_payment_id}`);
+                    toast.error(`Payment completed but record creation failed. Please contact support with this ID: ${response.razorpay_payment_id}`);
                     navigate('/support', {
                         state: {
                             paymentId: response.razorpay_payment_id,
                             error: error.message
                         }
                     });
+                } finally {
+                    setPaymentLoading(false);
+                }
+            },
+            modal: {
+                ondismiss: function() {
+                    setPaymentLoading(false);
+                    toast.error("Payment cancelled by user.");
                 }
             },
             notes: {
@@ -535,6 +561,12 @@ function BookEvent() {
         };
 
         const razorpay = new window.Razorpay(options);
+        
+        razorpay.on("payment.failed", function (response) {
+            setPaymentLoading(false);
+            toast.error(`Payment failed: ${response.error.description}`);
+        });
+
         razorpay.open();
     };
 
@@ -664,13 +696,23 @@ function BookEvent() {
                             </div>
 
                             <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
+                                whileHover={{ scale: !paymentLoading ? 1.02 : 1 }}
+                                whileTap={{ scale: !paymentLoading ? 0.98 : 1 }}
                                 type="submit"
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 px-6 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+                                disabled={paymentLoading}
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 px-6 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                <FaLock className="text-sm" />
-                                Proceed to Payment
+                                {paymentLoading ? (
+                                    <>
+                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                        <span>Opening Payment Gateway...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <FaLock className="text-sm" />
+                                        <span>Proceed to Payment</span>
+                                    </>
+                                )}
                             </motion.button>
                         </div>
                     </form>

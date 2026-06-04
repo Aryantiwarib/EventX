@@ -19,6 +19,7 @@ import {
 } from 'react-icons/fa'
 import { Button } from '../components'
 import parse from 'html-react-parser'
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import 'react-lazy-load-image-component/src/effects/blur.css'
@@ -413,48 +414,7 @@ function EventDetails() {
                 </div>
             </div>
 
-            {/* Footer */}
-            <div className="bg-white border-t mt-16">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                        <div>
-                            <div className="flex items-center mb-4">
-                                <div className="text-blue-600 font-bold text-xl">EventX</div>
-                            </div>
-                            <p className="text-sm text-gray-600">
-                                EventX is the ultimate platform for college event management, ticket generation, and check-in services.
-                            </p>
-                        </div>
-                        <div>
-                            <h3 className="font-semibold mb-4">Discover</h3>
-                            <ul className="space-y-2 text-sm text-gray-600">
-                                {["Events", "Categories", "Organizers", "Venues"].map((item) => (
-                                    <li key={item} className="hover:text-blue-600 cursor-pointer transition-colors">{item}</li>
-                                ))}
-                            </ul>
-                        </div>
-                        <div>
-                            <h3 className="font-semibold mb-4">Company</h3>
-                            <ul className="space-y-2 text-sm text-gray-600">
-                                {["About Us", "Contact", "Careers", "Press"].map((item) => (
-                                    <li key={item} className="hover:text-blue-600 cursor-pointer transition-colors">{item}</li>
-                                ))}
-                            </ul>
-                        </div>
-                        <div>
-                            <h3 className="font-semibold mb-4">Support</h3>
-                            <ul className="space-y-2 text-sm text-gray-600">
-                                {["Help Center", "Terms of Service", "Privacy Policy", "FAQ"].map((item) => (
-                                    <li key={item} className="hover:text-blue-600 cursor-pointer transition-colors">{item}</li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
-                    <div className="mt-8 pt-8 border-t text-sm text-gray-600">
-                        © 2025 EventX. All rights reserved.
-                    </div>
-                </div>
-            </div>
+
 
             {/* Image Modal - Full Screen */}
             <AnimatePresence>

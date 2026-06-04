@@ -1,10 +1,12 @@
 import React from 'react'
-import AddEvent from "../components/AddEvent/AddEvent"
+import { Container, AddEvent as AddEventComponent } from '../components'
 
 function AddEvent() {
   return (
-    <div>
-        <AddEvent/>
+    <div className='py-8 w-full'>
+      <Container>
+        <AddEventComponent />
+      </Container>
     </div>
   )
 }
